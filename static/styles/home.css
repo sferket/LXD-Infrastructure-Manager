@@ -1,0 +1,48 @@
+.title_bar {
+    background-color:#53A671;
+    color: white;
+    font-size: 20px;
+    text-align: center;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    margin-top: 5px;
+    margin-bottom: 15px;
+}
+
+.content_div{
+    background-color:#F0F0F0; 
+}
+
+.content_div ul{
+    list-style-type: None;
+    list-style-position: inside;
+    margin-top: 5px;
+    color:#427A57;
+}
+
+.list_header {
+   margin-top: 5px; 
+   font-size: 15px;
+   color:#595959;
+}
+
+.container_link {
+    color: #427A57 !important;
+    text-decoration: none;
+}
+
+.Running_bg {
+    background-color: #6CD994;
+}
+
+.Stopped_bg {
+    background-color: #D96C6C;
+}
+
+.Frozen_bg {
+    background-color: #6CD9D3;
+}
+
+td {
+    color: #2E2E2E;
+    }
