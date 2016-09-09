@@ -1,0 +1,24 @@
+
+server_auth:
+{
+        username: "<username>",
+        password: "<password>",
+}
+
+servers:
+[
+    { 
+        name: "<server name>"
+        endpoint: "https://ip:port"
+        verify: False
+        keyfile : "path/to/key.key"
+        certfile : "path/to/crt.crt" 
+    }
+    { 
+        name: "<server name>"
+        endpoint: "https://ip:port"
+        verify: False
+        keyfile : "path/to/key.key"
+        certfile : "path/to/crt.crt" 
+    }
+]
