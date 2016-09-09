@@ -1,3 +1,21 @@
+
+function update_memory_progressbar(s) {
+    console.log("update_memory");
+    pb_id = "#" + s + "_progress"; 
+    total_id = "#" + s + "_memtotal";
+    free_id = "#" + s + "_memfree";
+    total = $(total_id).text();
+    free = $(free_id).text();
+    total_int = parseInt(total, 10);
+    free_int = parseInt(free, 10);
+    prcnt = Math.floor((free_int / total_int) * 100);
+    prcnt_str = prcnt.toString(); 
+    $(pb_id).attr("aria-valuenow",prcnt_str);
+    $(pb_id).css("width",prcnt_str + "%");
+}
+
+setTimeout(update_memory_progressbar("server_one"),1000);
+
 function on_click_server(s) {
     pnl = "#collapse_" + s; 
     s_info = "#" + s + "_server_info";
@@ -8,7 +26,7 @@ function on_click_server(s) {
     else {
        $(s_info).show(); 
     }
-    update_memory_progressbar(s);
+    //update_memory_progressbar(s);
 }
 
 function on_click_container(s,c) {
@@ -40,9 +58,11 @@ function on_click_cmd(s, c, cmd) {
                             var status_td = "#" + s + "_" + c + "_status";
                             var status_info = "#" + s + "_" + c + "_status_info";
                             var status_span = "#" + s + "_" + c + "_status_span";
+                            var status_code = "#" + s + "_" + c + "_status_code";
                             $(tr).attr("class", server_status + "_bg");
                             $(status_td).text(server_status);
                             console.log("server status: " + server_status);
+                            $(status_code).text(data[s][i]["status_code"]);
                             if (server_status == "Running") { 
                                 console.log("running");
                                 var h = "<span class='label label-success'>" + server_status + "</span>";
@@ -64,6 +84,7 @@ function on_click_cmd(s, c, cmd) {
                                     h
                                 );
                             }
+                            set_button_activity(s,c,server_status);
                          }
                     }
                 },
@@ -71,21 +92,46 @@ function on_click_cmd(s, c, cmd) {
         });
 }
 
-function update_memory_progressbar(s) {
-    pb_id = "#" + s + "_progress"; 
-    total_id = "#" + s + "_memtotal";
-    free_id = "#" + s + "_memfree";
-    total = $(total_id).text();
-    free = $(free_id).text();
-    total_int = parseInt(total, 10);
-    free_int = parseInt(free, 10);
-    prcnt = Math.floor((free_int / total_int) * 100);
-    prcnt_str = prcnt.toString(); 
-    $(pb_id).attr("aria-valuenow",prcnt_str);
-    $(pb_id).css("width",prcnt_str + "%");
+function set_button_activity(s,c,state){
+    var start_button = "#" + s + "_" + c + "_startbutton";
+    var stop_button = "#" + s + "_" + c + "_stopbutton";
+    var freeze_button = "#" + s + "_" + c + "_freezebutton";
+    var unfreeze_button = "#" + s + "_" + c + "_unfreezebutton";
+    var start_button_ct = "#" + c + "_" + s + "_startbutton";
+    var stop_button_ct = "#" + c + "_" + s + "_stopbutton";
+    var freeze_button_ct = "#" + c + "_" + s + "_freezebutton";
+    var unfreeze_button_ct = "#" + c + "_" + s + "_unfreezetbutton";
+    if(state=="Running"){
+        $(start_button).attr("class","btn btn-default disabled");
+        $(stop_button).attr("class","btn btn-default");
+        $(freeze_button).attr("class","btn btn-default");
+        $(unfreeze_button).attr("class","btn btn-default disabled");
+        $(start_button_ct).attr("class","btn btn-default disabled");
+        $(stop_button_ct).attr("class","btn btn-default");
+        $(freeze_button_ct).attr("class","btn btn-default");
+        $(unfreeze_button_ct).attr("class","btn btn-default disabled");
+    }
+    else if(state=="Stopped"){
+        $(start_button).attr("class","btn btn-default");
+        $(stop_button).attr("class","btn btn-default disabled");
+        $(freeze_button).attr("class","btn btn-default disabled");
+        $(unfreeze_button).attr("class","btn btn-default disabled");
+        $(start_button_ct).attr("class","btn btn-default");
+        $(stop_button_ct).attr("class","btn btn-default disabled");
+        $(freeze_button_ct).attr("class","btn btn-default disabled");
+        $(unfreeze_button_ct).attr("class","btn btn-default disabled");
+    }
+    else if(state=="Frozen"){
+        $(start_button).attr("class","btn btn-default disabled");
+        $(stop_button).attr("class","btn btn-default disabled");
+        $(freeze_button).attr("class","btn btn-default disabled");
+        $(unfreeze_button).attr("class","btn btn-default");
+        $(start_button_ct).attr("class","btn btn-default disabled");
+        $(stop_button_ct).attr("class","btn btn-default disabled");
+        $(freeze_button_ct).attr("class","btn btn-default disabled");
+        $(unfreeze_button_ct).attr("class","btn btn-default");
+    }
 }
-
-
 
 /*
 function on_click_server(s){

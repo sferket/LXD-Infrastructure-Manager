@@ -126,36 +126,62 @@
             </div>
             <table class='table-bordered col-xs-12 well'>
                 <tr>
-                    <th>Container name</th>
-                    <th>Status</th>
-                    <th>Actions</th>
+                    <th class="center-text"><h4><b>Container name</b></h4></th>
+                    <th class="center-text"><h4><b>Status</b></h4></th>
+                    <th class="center-text"><h4><b>Actions</b></h4></th>
                 </tr>
                 {% for c in containers[s] %}
                 <tr class="{{c['status']}}_bg" {{s}}_tr
                     id="{{s}}_{{c['name']}}_trr">
-                    <td>{{c['name']}}</td>
-                    <td id="{{s}}_{{c['name']}}_status">{{ c['status'] }} </td>
-                    <td>
-                        <button onclick="javascript:on_click_cmd('{{s}}','{{c['name']}}','start')">
+                    <td class="center-text pad5p">{{c['name']}}</td>
+                    <td id="{{s}}_{{c['name']}}_status" class="center-text pad5p">{{ c['status'] }} </td>
+                    <td class="center-text pad5p">
+                    <div class="btn-group" role="group">
+                        <button 
+                            id="{{s}}_{{c['name']}}_startbutton"
+                            class="btn btn-default {{
+                                'disabled' 
+                                    if c['status'] in ['Running','Frozen'] 
+                                }}" 
+                            onclick="javascript:on_click_cmd('{{s}}','{{c['name']}}','start')">
                             <span class="glyphicon glyphicon-play" aria-hidden="true">
                             </span>
                             start
                         </button>
-                        <button onclick="javascript:on_click_cmd('{{s}}','{{c['name']}}','stop')">
+                        <button 
+                            id="{{s}}_{{c['name']}}_stopbutton"
+                            class="btn btn-default {{
+                                'disabled' 
+                                    if c['status'] in ['Stopped','Frozen']
+                                }}" 
+                            onclick="javascript:on_click_cmd('{{s}}','{{c['name']}}','stop')">
                             <span class="glyphicon glyphicon-stop" aria-hidden="true">
                             </span>
                             stop
                         </button>
-                        <button onclick="javascript:on_click_cmd('{{s}}','{{c['name']}}','freeze')">
+                        <button 
+                            id="{{s}}_{{c['name']}}_freezebutton"
+                            class="btn btn-default {{
+                                'disabled' 
+                                    if c['status'] in ['Frozen','Stopped']
+                                }}" 
+                            onclick="javascript:on_click_cmd('{{s}}','{{c['name']}}','freeze')">
                             <span class="glyphicon glyphicon-pause" aria-hidden="true">
                             </span>
                             freeze
                         </button>
-                        <button onclick="javascript:on_click_cmd('{{s}}','{{c['name']}}','unfreeze')">
+                        <button 
+                            id="{{s}}_{{c['name']}}_unfreezebutton"
+                            class="btn btn-default {{
+                                'disabled' 
+                                    if c['status'] != 'Frozen'
+                                }}" 
+                            onclick="javascript:on_click_cmd('{{s}}','{{c['name']}}','unfreeze')">
                             <span class="glyphicon glyphicon-retweet" aria-hidden="true">
                             </span>
                             unfreeze
                         </button>
+                    </div>
                     </td>
                 </tr>
                 {% endfor %}
@@ -174,23 +200,47 @@
                         </b>
                     </h1>
                 </div>
-                <div class="pull-right">
-                    <button onclick="javascript:on_click_cmd('{{s}}','{{c['name']}}','start')">
+                <div class="btn-group pull-right" role="group">
+                    <button 
+                        id="{{c['name']}}_{{s}}_startbutton"
+                        class="btn btn-default {{
+                            'disabled' 
+                                if c['status'] in ['Running','Frozen'] 
+                            }}" 
+                        onclick="javascript:on_click_cmd('{{s}}','{{c['name']}}','start')">
                         <span class="glyphicon glyphicon-play" aria-hidden="true">
                         </span>
                         start
                     </button>
-                    <button onclick="javascript:on_click_cmd('{{s}}','{{c['name']}}','stop')">
+                    <button 
+                        id="{{c['name']}}_{{s}}_stopbutton"
+                        class="btn btn-default {{
+                            'disabled' 
+                                if c['status'] in ['Stopped','Frozen']
+                            }}" 
+                        onclick="javascript:on_click_cmd('{{s}}','{{c['name']}}','stop')">
                         <span class="glyphicon glyphicon-stop" aria-hidden="true">
                         </span>
                         stop
                     </button>
-                    <button onclick="javascript:on_click_cmd('{{s}}','{{c['name']}}','freeze')">
+                    <button 
+                        id="{{c['name']}}_{{s}}_freezebutton"
+                        class="btn btn-default {{
+                            'disabled' 
+                                if c['status'] in ['Frozen','Stopped']
+                            }}" 
+                        onclick="javascript:on_click_cmd('{{s}}','{{c['name']}}','freeze')">
                         <span class="glyphicon glyphicon-pause" aria-hidden="true">
                         </span>
                         freeze
                     </button>
-                    <button onclick="javascript:on_click_cmd('{{s}}','{{c['name']}}','unfreeze')">
+                    <button 
+                        id="{{c['name']}}_{{s}}_unfreezebutton"
+                        class="btn btn-default {{
+                            'disabled' 
+                                if c['status'] != 'Frozen'
+                            }}" 
+                        onclick="javascript:on_click_cmd('{{s}}','{{c['name']}}','unfreeze')">
                         <span class="glyphicon glyphicon-pause" aria-hidden="true">
                         </span>
                         unfreeze
@@ -221,7 +271,7 @@
                         </tr>
                         <tr>
                             <td>status_code:</td>
-                            <td>{{ c["status_code"] }}</td>
+                            <td id="{{s}}_{{c['name']}}_status_code">{{ c["status_code"] }}</td>
                         </tr>
                         <tr>
                             <td>created_at:</td>
