@@ -18,31 +18,28 @@
 #
 ##############################################################################
 from flask import Flask, render_template, jsonify
-import app as api
+from app import LxdApi, SshApi
 import sys
 from config import Config
 
 app = Flask(__name__)
-f = file("server_cfg.cfg")
-cfg = Config(f)
-servers = [server.name for server in cfg.servers]
-uname = cfg.server_auth.username
-s_pwd = cfg.server_auth.password
-
+config = {}
 
 @app.route("/")
 def main():
+    lxd = LxdApi(config)
     containers = {}
-    for s in servers:
-        containers[s] = api.get_containers(s)
+    for s in config:
+        containers[s] = lxd.get_container_info(s)
 
+    ssh = SshApi(config)
     server_info = {}
-    for s in servers:
-        server_info[s] = api.get_server_info(s, uname, s_pwd)
+    for s in config:
+        server_info[s] = ssh.get_server_info(s)
 
     return render_template(
         "home.html", 
-        servers=servers, 
+        servers=config, 
         containers=containers, 
         server_info=server_info
     )
@@ -50,23 +47,43 @@ def main():
 
 @app.route("/cmd/<server>/<container>/<method>")
 def cmd(server, container, method):
-    api.container_cmd(server, container, method)
+    lxd = LxdApi(config)
+    lxd.exec_container_cmd(server, container, method)
     return ("",204) 
 
 
 @app.route("/update/container/info/")
 def update_container_info():
+    lxd = LxdApi(config)
     containers = {} 
-    for s in servers:
-        containers[s] = api.get_containers(s)
+    for s in config:
+        containers[s] = lxd.get_container_info(s)
     return jsonify(containers)
 
 
-@app.after_request
-def add_header(response):
-    response.headers["Cache-Control"] = "public, max-age=0"
-    return response
+def get_configuration():
+    f = file("server_cfg.cfg")
+    cfg = Config(f)
+    config = {}
 
+    for server in cfg.servers:
+        config[server.name] = {
+            "username": server.username,
+            "password": server.password,
+            "endpoint": server.endpoint,
+            "cert": (server.certfile,server.keyfile),
+            "verify": server.verify,
+            "keyfile": server.keyfile,
+            "certfile": server.certfile,
+        }
+
+    return config
 
 if __name__ == "__main__":
+    config = get_configuration()
     app.run(debug=True)
+
+#@app.after_request
+#def add_header(response):
+#    response.headers["Cache-Control"] = "public, max-age=0"
+#    return response
