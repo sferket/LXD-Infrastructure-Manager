@@ -1,6 +1,5 @@
 
 function update_memory_progressbar(s) {
-    console.log("update_memory");
     pb_id = "#" + s + "_progress"; 
     total_id = "#" + s + "_memtotal";
     free_id = "#" + s + "_memfree";
@@ -133,63 +132,114 @@ function set_button_activity(s,c,state){
     }
 }
 
-/*
-function on_click_server(s){
-    pnl = "#collapse_" + s;
-    tr = "." + s + "_tr";
-    server_info_div = "#" + s + "_server_info_div";
+var myChart;
+window.onload = function() {
+    var ctx = document.getElementById("graphContainer");
+    myChart = new Chart(ctx, {
+        type: 'line',
+        label: "Cpu usage per server",
+        data: {
+            labels: [],
+            datasets: [
+                {
+                    label: "Dataset 1",
+                    fill: false,
+                    lineTension: 0.1,
+                    backgroundColor: "rgba(75,192,192,0.4)",
+                    borderColor: "rgba(75,192,192,1)",
+                    borderCapStyle: "butt",
+                    borderDash: [],
+                    borderDashOffset: 0.0,
+                    borderJoinStyle: "miter",
+                    pointBorderColor: "rgba(75,192,192,1)",
+                    pointBackgroundColor: "#fff",
+                    pointBorderWidth: 1,
+                    pointHoverRadius: 5,
+                    pointHoverBackgroundColor: "rgba(75,192,192,1)",
+                    pointHoverBorderColor: "rgba(220,220,220,1)",
+                    pointHoverBorderWidth: 2,
+                    pointRadius: 1,
+                    pointHitRadius: 10,
+                    data: [65, 40, 23, 54, 34, 90, 45],
+                    spanGaps: false,
+                }
+            ]
+        }
+    });
+}
 
-    if ($(pnl).hasClass("in")) {
-        $(tr).css("display","none");
-        $(server_info_div).css("display","none");
+var update_graph = function(data) {
+    var ctx = document.getElementById("graphContainer");
+    var cpu_datasets = []
+    var label_ticks = []
+    for (s in data){
+        server_data = {
+            label: s,
+            fill: false,
+            lineTension: 0.1,
+            backgroundColor: data[s]["color"],
+            borderColor: data[s]["color"],
+            borderCapStyle: "butt",
+            borderDash: [],
+            borderDashOffset: 0.0,
+            borderJoinStyle: "miter",
+            pointBorderColor: "rgba(75,192,192,1)",
+            pointBackgroundColor: "#fff",
+            pointBorderWidth: 1,
+            pointHoverRadius: 5,
+            pointHoverBackgroundColor: "rgba(75,192,192,1)",
+            pointHoverBorderColor: "rgba(220,220,220,1)",
+            pointHoverBorderWidth: 2,
+            pointRadius: 1,
+            pointHitRadius: 10,
+            data: data[s]["data"],
+            spanGaps: false,
+        }
+        cpu_datasets = cpu_datasets.concat(server_data);
+        label_ticks = data[s]["labels"]
     }
-    else {
-        $(tr).css("display","table-row");
-        $(server_info_div).css("display","block");
-        update_memory_progressbar(s);
-    }
+    /* if we don't destroy the old chart, old datapoints will continue to exist
+       causing hover to show wrong data/transform the graph*/
+    //myChart.destroy();
+    myChart.data.xLabels = label_ticks;
+    myChart.data.datasets = cpu_datasets;
+    myChart.update(0,0);
+    /*
+    myChart = new Chart(ctx, {
+        type: 'line',
+        label: "Cpu usage per server",
+        data: {
+            xLabels: label_ticks,
+            datasets: cpu_datasets, 
+        },
+        options: {
+            hover: {
+                mode: 'false'
+            }
+        }
+    });*/
 }
+    
 
-function on_click_cmd(s,c,cmd) {
-    var cmd_url = "/cmd/" + s + "/" + c + "/" + cmd;
-    console.log("cmd_url: " + cmd_url);
-    $.ajax({
-        url: cmd_url,
-        type: "GET",
-    })
-    console.log("post-ajax");
-    $("#server_info_table").load("/" + " #actual_table");
-    var z = "#collapse_" + s;
-    var y = " ." + s + "_tr";
-    $(z).addClass("in");
-    console.log("on click 2");
-    $("#actual_table").load("/" + y);
-    console.log("done");
-}
 
-function on_click_cont(c) {
-    console.log("c: " + c);
-    $("#server_info_table").css("display","none");
-    var cont_divs =  document.getElementsByClassName("container_info");
-    for (var i=0; i<cont_divs.length; i++) {
-        cont_divs[i].style.display = "None";
-    }
-    c_id = "#" + c + "_cont_info";
-    $(c_id).css("display","block");
-}
+$(document).ready(function(){
+    namespace = "/update";
+    var socket = io.connect(
+        "http://" 
+        + document.domain 
+        + ":" 
+        + location.port 
+        + namespace
+    );
 
-function update_memory_progressbar(s) {
-    pb_id = "#" + s + "_progress"; 
-    total_id = "#" + s + "_memtotal";
-    free_id = "#" + s + "_memfree";
-    total = $(total_id).text();
-    free = $(free_id).text();
-    total_int = parseInt(total, 10);
-    free_int = parseInt(free, 10);
-    prcnt = 100 - Math.floor((free_int / total_int) * 100);
-    prcnt_str = prcnt.toString(); 
-    $(pb_id).attr("aria-valuenow",prcnt_str);
-    $(pb_id).css("width",prcnt_str + "%");
-    $(pb_id).text(prcnt_str + "%");
-}
-*/
+    socket.on("connect", function(msg) {
+        socket.emit("got event", {data: "Im connected!"});
+    });
+
+
+    socket.on("message", function(msg) {
+        update_graph(msg.cpu_usage);
+    });
+
+});
+

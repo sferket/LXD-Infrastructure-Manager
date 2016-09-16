@@ -1,12 +1,14 @@
 {% extends "main.html" %}
 {% block body %}
 <link href="{{ url_for('static',filename='styles/home.css') }}" type="text/css" rel="stylesheet"/>
+<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.6/socket.io.min.js"></script>
 <!-- ?1000 forces refresh of js file instead of cache -->
-<script src="{{url_for('static',filename='home.js')}}?1000"></script>
+<script src="{{url_for('static',filename='home.js')}}?999"></script>
 <div class="container" style="border: 1px solid black;">
     <!-- title bar -->
     <div class="col-xs-12 title_bar">
        Saas Admin Web Panel 
+       <p id="test">Test</p>
     </div>
 
     <!-- content -->
@@ -75,6 +77,10 @@
         <div class="col-xs-12" class="server_info_div well well-lg" 
             id="{{s}}_server_info" style="display:none;">
             <div class="col-xs-12 content_div">
+                <!--
+                <div id="graphContainer" style="height:400px;min-width:310px;"></div>
+                -->
+                <canvas id="graphContainer" width="400" height="400"></canvas>
             <!--
                 <h1>0</h1>
                 <p>{{ server_info[s][0] }}</p>
@@ -109,7 +115,7 @@
                         </h4>
                         <div class="progress">
                             <div class="progress-bar" role="progressbar" aria-valuemax="100"
-                                style="width:60%" aria-valuenow="60" id="{{s}}_progress">
+                                id="{{s}}_progress">
                             </div>
                         </div>
                     </div>

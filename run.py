@@ -17,13 +17,75 @@
 #    <http://www.gnu.org/licenses/gpl.html>.
 #
 ##############################################################################
-from flask import Flask, render_template, jsonify
-from app import LxdApi, SshApi
+#from gevent import monkey
+#monkey.patch_all()
+import eventlet
+eventlet.monkey_patch()
+from flask import Flask, render_template, jsonify, session, request
+from threading import Thread
+from flask_socketio import SocketIO, emit, join_room ,disconnect
+from app import LxdApi, SshApi, GetCpuLoad
 import sys
 from config import Config
+import time
+import random
 
 app = Flask(__name__)
+app.debug = True
+app.config["SECRET_KEY"] = "secret!"
+socketio = SocketIO(app)
+thread = None
 config = {}
+
+def update_thread():
+    server_cpu_usage = {}
+    label_ticker = 1
+    while True:
+        time.sleep(5)
+        for s in config:
+            # get ip from endpoint
+            server_ip = config[s]["endpoint"]
+            server_ip = server_ip.split(":")
+            server_ip = server_ip[1]
+            server_ip = server_ip.replace("//","")
+
+            # get cpu usage
+            cpu_api = GetCpuLoad(
+                server_ip=server_ip,
+                username=config[s]["username"],
+                password=config[s]["password"],
+            )
+            data = cpu_api.get_cpu_load()
+            total_cpu_usage = 0.0
+            for d in data:
+                total_cpu_usage += data[d]
+            total_cpu_usage = total_cpu_usage / len(data)
+
+            if not s in server_cpu_usage.keys():
+                # if new server 
+                server_cpu_usage[s] = {} 
+
+            if 'data' in server_cpu_usage[s].keys():
+                server_cpu_usage[s]["labels"].append(label_ticker)
+                server_cpu_usage[s]["data"].append(total_cpu_usage)
+            else:
+                server_cpu_usage[s]["labels"] = [label_ticker]
+                server_cpu_usage[s]["data"] = [total_cpu_usage]
+
+            # save max of 10 datapoints
+            if len(server_cpu_usage[s]["data"]) > 10:
+                server_cpu_usage[s]["labels"].pop(0)
+                server_cpu_usage[s]["data"].pop(0)
+
+            server_cpu_usage[s]["color"] = config[s]["rgba_color"]
+
+        label_ticker += 1
+        socketio.emit(
+            "message", 
+            {"data": "This is data", 
+             "cpu_usage": server_cpu_usage}, 
+            namespace="/update"
+        )
 
 @app.route("/")
 def main():
@@ -37,12 +99,29 @@ def main():
     for s in config:
         server_info[s] = ssh.get_server_info(s)
 
+    global thread
+    if thread is None:
+        thread = Thread(target=update_thread)
+        thread.start()
+
     return render_template(
         "home.html", 
         servers=config, 
         containers=containers, 
         server_info=server_info
     )
+
+@socketio.on("got event", namespace="/update")
+def got_event(msg):
+    print "msg['data']: %s" % msg['data']
+
+@socketio.on("connect", namespace="/update")
+def test_connect():
+    emit("my response", {"data": "Connected", "count": 0})
+
+@socketio.on("disconnect", namespace="/update")
+def test_disconnect():
+    print "Client disconnected"
 
 
 @app.route("/cmd/<server>/<container>/<method>")
@@ -75,15 +154,18 @@ def get_configuration():
             "verify": server.verify,
             "keyfile": server.keyfile,
             "certfile": server.certfile,
+            "rgba_color": "rgba(%s,%s,%s,1)" % (random.randrange(255),random.randrange(255),random.randrange(255))
         }
 
     return config
 
+@app.after_request
+def add_header(response):
+    response.headers["Cache-Control"] = "public, max-age=0"
+    return response
+
 if __name__ == "__main__":
     config = get_configuration()
-    app.run(debug=True)
+    #app.run(debug=True)
+    socketio.run(app)
 
-#@app.after_request
-#def add_header(response):
-#    response.headers["Cache-Control"] = "public, max-age=0"
-#    return response

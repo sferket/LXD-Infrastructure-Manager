@@ -27,7 +27,7 @@ class GetCpuLoad(object):
 
     def __init__(
         self, percentage=True, 
-        sleeptime=3, server_ip=None, 
+        sleeptime=1, server_ip=None, 
         username=None, password=None
     ):
         self.percentage = percentage
