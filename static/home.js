@@ -132,17 +132,22 @@ function set_button_activity(s,c,state){
     }
 }
 
-var myChart;
-window.onload = function() {
-    var ctx = document.getElementById("graphContainer");
-    myChart = new Chart(ctx, {
+
+var initial_setup_charts = true;
+var myCharts = {};
+
+function setup_chart(server) {
+    console.log("set_chart");
+    var chart_id = s + "_chart_container";
+    var ctx = document.getElementById(chart_id);
+    myCharts[server] = new Chart(ctx, {
         type: 'line',
         label: "Cpu usage per server",
         data: {
             labels: [],
             datasets: [
                 {
-                    label: "Dataset 1",
+                    label: s,
                     fill: false,
                     lineTension: 0.1,
                     backgroundColor: "rgba(75,192,192,0.4)",
@@ -167,60 +172,50 @@ window.onload = function() {
         }
     });
 }
-
 var update_graph = function(data) {
-    var ctx = document.getElementById("graphContainer");
-    var cpu_datasets = []
-    var label_ticks = []
-    for (s in data){
-        server_data = {
-            label: s,
-            fill: false,
-            lineTension: 0.1,
-            backgroundColor: data[s]["color"],
-            borderColor: data[s]["color"],
-            borderCapStyle: "butt",
-            borderDash: [],
-            borderDashOffset: 0.0,
-            borderJoinStyle: "miter",
-            pointBorderColor: "rgba(75,192,192,1)",
-            pointBackgroundColor: "#fff",
-            pointBorderWidth: 1,
-            pointHoverRadius: 5,
-            pointHoverBackgroundColor: "rgba(75,192,192,1)",
-            pointHoverBorderColor: "rgba(220,220,220,1)",
-            pointHoverBorderWidth: 2,
-            pointRadius: 1,
-            pointHitRadius: 10,
-            data: data[s]["data"],
-            spanGaps: false,
+    if (initial_setup_charts) {
+        for (s in data) {
+            setup_chart(s);
         }
-        cpu_datasets = cpu_datasets.concat(server_data);
-        label_ticks = data[s]["labels"]
+        initial_setup_charts = false;
     }
-    /* if we don't destroy the old chart, old datapoints will continue to exist
-       causing hover to show wrong data/transform the graph*/
-    //myChart.destroy();
-    myChart.data.xLabels = label_ticks;
-    myChart.data.datasets = cpu_datasets;
-    myChart.update(0,0);
-    /*
-    myChart = new Chart(ctx, {
-        type: 'line',
-        label: "Cpu usage per server",
-        data: {
-            xLabels: label_ticks,
-            datasets: cpu_datasets, 
-        },
-        options: {
-            hover: {
-                mode: 'false'
-            }
+    for (s in data) {
+        var chart_id = s +"_chart_container";
+        var ctx = document.getElementById(chart_id);
+        var cpu_datasets = []
+        var cpu_label_ticks = []
+        var server_cpu_data = data[s]["data"];
+        for (c in server_cpu_data) {
+            var cpu_data = {
+                label: s,
+                fill: false,
+                lineTension: 0.1,
+                backgroundColor: data[s]["color"],
+                borderColor: data[s]["color"],
+                borderCapStyle: "butt",
+                borderDash: [],
+                borderDashOffset: 0.0,
+                borderJoinStyle: "miter",
+                pointBorderColor: "rgba(75,192,192,1)",
+                pointBackgroundColor: "#fff",
+                pointBorderWidth: 1,
+                pointHoverRadius: 5,
+                pointHoverBackgroundColor: "rgba(75,192,192,1)",
+                pointHoverBorderColor: "rgba(220,220,220,1)",
+                pointHoverBorderWidth: 2,
+                pointRadius: 1,
+                pointHitRadius: 10,
+                data: server_cpu_data[c],
+                spanGaps: false,
+            }      
+            cpu_datasets = cpu_datasets.concat(cpu_data);
+            label_ticks = data[s]["labels"][c];
         }
-    });*/
-}
-    
-
+        myCharts[s].data.xLabels = label_ticks;
+        myCharts[s].data.datasets = cpu_datasets;
+        myCharts[s].update(0,0);
+    }
+    };
 
 $(document).ready(function(){
     namespace = "/update";
