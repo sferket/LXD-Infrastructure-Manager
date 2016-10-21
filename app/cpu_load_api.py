@@ -17,7 +17,6 @@
 #    <http://www.gnu.org/licenses/gpl.html>.
 #
 ##############################################################################
-
 from time import sleep
 import sys
 from paramiko import SSHClient, AutoAddPolicy
@@ -25,13 +24,10 @@ from paramiko import SSHClient, AutoAddPolicy
 
 class GetCpuLoad(object):
 
-    def __init__(
-        self, percentage=True, 
-        sleeptime=1, server_ip=None, 
-        username=None, password=None
-    ):
+    def __init__(self, percentage=True,sleeptime=1, server_ip=None,
+        username=None, password=None):
         self.percentage = percentage
-        self.sep = ' ' 
+        self.sep = ' '
         self.sleeptime = sleeptime
         self.client = SSHClient()
         self.client.set_missing_host_key_policy(AutoAddPolicy())
@@ -40,7 +36,7 @@ class GetCpuLoad(object):
     def update_cpu_stats(self):
         stdin,stdout,stderr = self.client.exec_command("cat /proc/stat")
         self.stats = stdout.readlines()
-        
+
     def get_cpu_time(self):
         self.update_cpu_stats()
         cpu_infos = {} #collect here the information
@@ -74,5 +70,5 @@ class GetCpuLoad(object):
 
             CPU_Percentage=((Total-PrevTotal)-(Idle-PrevIdle))/(Total-PrevTotal)*100
             cpu_load.update({cpu: CPU_Percentage})
-        
+
         return cpu_load

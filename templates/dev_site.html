@@ -1,0 +1,58 @@
+{% extends "main.html" %}
+{% block body %}
+
+<script src="{{url_for('static',filename='home.js')}}?999"></script>
+
+<ul>
+    {% for s in servers %}
+        <li>{{s}}</li>
+        <ul>
+            {% for c in containers[s] %}
+            <li>
+            <p>
+                {{c["name"]}}
+                -
+                {{c["status"]}}
+                <button id="{{s}}_{{c['name']}}_startbutton"
+                onclick="javascript:on_click_cmd('{{s}}','{{c['name']}}','start')">
+                    start
+                </button>
+                <button id="{{s}}_{{c['name']}}_stopbutton"
+                onclick="javascript:on_click_cmd('{{s}}','{{c['name']}}','stop')">
+                    stop
+                </button>
+                <button id="{{s}}_{{c['name']}}_freezebutton"
+                onclick="javascript:on_click_cmd('{{s}}','{{c['name']}}','freeze')">
+                    freeze 
+                </button>
+                <button id="{{s}}_{{c['name']}}_unfreezebutton"
+                onclick="javascript:on_click_cmd('{{s}}','{{c['name']}}','unfreeze')">
+                    unfreeze 
+                </button>
+                <button id="{{s}}_{{c['name']}}_createsnapbutton"
+                onclick="javascript:on_click_cmd('{{s}}','{{c['name']}}','create_snapshot')">
+                    create snap 
+                </button>
+            </p>
+            <ul>
+                {% for snap in c["snapshots"] %}
+                    <li>
+                        {{snap}}
+                        <button onclick="javascript:snap_cmd('{{s}}',
+                        '{{snap}}','{{c['name']}}','activate')" >
+                           Activate 
+                        </button>
+                        <button onclick="javascript:snap_cmd('{{s}}',
+                        '{{snap}}','{{c['name']}}','delete')" >
+                            Delete
+                        </button>
+                    </li>
+                {% endfor %}
+            </ul>
+            {% endfor %}
+        </ul>
+    {% endfor %}
+</ul>
+
+{% endblock %}
+

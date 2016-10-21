@@ -1,4 +1,4 @@
-# -*- encoding: utf-8 -*-
+# -*- coding: utf-8 -*-
 ##############################################################################
 #    Copyright (c) 2016 - Open2bizz
 #    Author: Open2bizz
@@ -31,6 +31,9 @@ import time
 import random
 
 import pdb
+import requests
+from requests.packages.urllib3.exceptions import InsecureRequestWarning
+requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
 app = Flask(__name__)
 app.debug = True
@@ -39,57 +42,60 @@ socketio = SocketIO(app)
 thread = None
 config = {}
 
+def update_cpu_info(server_cpu_usage,label_ticker):
+    for s in config:
+        # get ip from endpoint
+        server_ip = config[s]["endpoint"]
+        server_ip = server_ip.split(":")
+        server_ip = server_ip[1]
+        server_ip = server_ip.replace("//","")
+
+        # get cpu usage
+        cpu_api = GetCpuLoad(
+            server_ip=server_ip,
+            username=config[s]["username"],
+            password=config[s]["password"],
+        )
+
+        if not s in server_cpu_usage.keys():
+            # if new server
+            server_cpu_usage[s] = {}
+
+        data = cpu_api.get_cpu_load()
+        total_cpu_usage = 0.0
+        cpu_data = {}
+        for d in data:
+            cpu_data[d] = data[d]
+            if 'data' in server_cpu_usage[s].keys():
+                if d in server_cpu_usage[s]["labels"].keys():
+                    server_cpu_usage[s]["labels"][d].append(label_ticker)
+                    server_cpu_usage[s]["data"][d].append(total_cpu_usage)
+                else:
+                    server_cpu_usage[s]["labels"][d] = [label_ticker]
+                    server_cpu_usage[s]["data"][d] = [total_cpu_usage]
+            else:
+                server_cpu_usage[s]["labels"] = {}
+                server_cpu_usage[s]["data"] = {}
+                server_cpu_usage[s]["labels"][d] = [label_ticker]
+                server_cpu_usage[s]["data"][d] = [total_cpu_usage]
+
+            # save max of 10 datapoints
+            if len(server_cpu_usage[s]["data"][d]) > 10:
+                server_cpu_usage[s]["labels"][d].pop(0)
+                server_cpu_usage[s]["data"][d].pop(0)
+
+        server_cpu_usage[s]["color"] = config[s]["rgba_color"]
+    return server_cpu_usage
+
 def update_thread():
     server_cpu_usage = {}
     label_ticker = 1
     while True:
         time.sleep(5)
-        for s in config:
-            # get ip from endpoint
-            server_ip = config[s]["endpoint"]
-            server_ip = server_ip.split(":")
-            server_ip = server_ip[1]
-            server_ip = server_ip.replace("//","")
-
-            # get cpu usage
-            cpu_api = GetCpuLoad(
-                server_ip=server_ip,
-                username=config[s]["username"],
-                password=config[s]["password"],
-            )
-
-            if not s in server_cpu_usage.keys():
-                # if new server
-                server_cpu_usage[s] = {}
-
-            data = cpu_api.get_cpu_load()
-            print "data: %s" % data
-            total_cpu_usage = 0.0
-            cpu_data = {}
-            for d in data:
-                cpu_data[d] = data[d]
-                if 'data' in server_cpu_usage[s].keys():
-                    if d in server_cpu_usage[s]["labels"].keys():
-                        server_cpu_usage[s]["labels"][d].append(label_ticker)
-                        server_cpu_usage[s]["data"][d].append(total_cpu_usage)
-                    else:
-                        server_cpu_usage[s]["labels"][d] = [label_ticker]
-                        server_cpu_usage[s]["data"][d] = [total_cpu_usage]
-                else:
-                    server_cpu_usage[s]["labels"] = {}
-                    server_cpu_usage[s]["data"] = {}
-                    server_cpu_usage[s]["labels"][d] = [label_ticker]
-                    server_cpu_usage[s]["data"][d] = [total_cpu_usage]
-
-                # save max of 10 datapoints
-                if len(server_cpu_usage[s]["data"][d]) > 10:
-                    server_cpu_usage[s]["labels"][d].pop(0)
-                    server_cpu_usage[s]["data"][d].pop(0)
-
-            server_cpu_usage[s]["color"] = config[s]["rgba_color"]
-
+        server_cpu_usage = update_cpu_info(server_cpu_usage, label_ticker)
+        print "Updating cpu usage"
+        #print "server_cpu_usage: %s" % server_cpu_usage
         label_ticker += 1
-        print "server_cpu_usage: %s" % server_cpu_usage
         socketio.emit(
             "message",
             {"data": "This is data",
@@ -115,7 +121,7 @@ def main():
         thread.start()
 
     return render_template(
-        "home.html",
+        "dev_site.html",
         servers=config,
         containers=containers,
         server_info=server_info
@@ -138,6 +144,12 @@ def test_disconnect():
 def cmd(server, container, method):
     lxd = LxdApi(config)
     lxd.exec_container_cmd(server, container, method)
+    return ("",204)
+
+@app.route("/snapcmd/<server>/<snap>/<container>/<method>")
+def snapcmd(server, snap, container, method):
+    lxd = LxdApi(config)
+    lxd.exec_snapshot_cmd(server, snap, container, method)
     return ("",204)
 
 @app.route("/update/container/info/")

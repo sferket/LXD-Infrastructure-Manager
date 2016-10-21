@@ -1,4 +1,3 @@
-
 function update_memory_progressbar(s) {
     pb_id = "#" + s + "_progress"; 
     total_id = "#" + s + "_memtotal";
@@ -35,7 +34,7 @@ function on_click_container(s,c) {
 }
 
 function on_click_cmd(s, c, cmd) {
-    var cmd_url = "/cmd/" + s + "/" + c + "/" + cmd;
+    var cmd_url = "/cmd/" + s + "/"  + c + "/" + cmd;
     $.ajax({
         url: cmd_url,
         type: "GET",
@@ -89,6 +88,14 @@ function on_click_cmd(s, c, cmd) {
                 },
             })
         });
+}
+
+function snap_cmd(s, snap, c, cmd) {
+    var cmd_url = "/snapcmd/" + s + "/" + snap + "/" + c + "/" + cmd;
+    $.ajax({
+        url: cmd_url,
+        type: "GET",
+    })
 }
 
 function set_button_activity(s,c,state){
