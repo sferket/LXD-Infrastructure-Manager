@@ -1,24 +1,7 @@
 # -*- encoding: utf-8 -*-
-##############################################################################
-#    Copyright (c) 2016 - Open2bizz
-#    Author: Open2bizz
-#
-#    This program is free software: you can redistribute it and/or modify
-#    it under the terms of the GNU General Public License as published by
-#    the Free Software Foundation, either version 3 of the License, or
-#    (at your option) any later version.
-#
-#    This program is distributed in the hope that it will be useful,
-#    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#    GNU General Public License for more details.
-#
-#    A copy of the GNU General Public License is available at:
-#    <http://www.gnu.org/licenses/gpl.html>.
-#
-##############################################################################
-from paramiko import SSHClient, AutoAddPolicy
-from cpu_load_api import *
+from paramiko import SSHClient
+from paramiko import AutoAddPolicy
+from application.api.cpu_load_api import GetCpuLoad
 
 
 class SshApi(object):
@@ -27,7 +10,6 @@ class SshApi(object):
         self.config = config
         self.client = SSHClient()
         self.client.set_missing_host_key_policy(AutoAddPolicy())
-
 
     def _execute_ssh_command(self, command):
         stdin, stdout, stderr = self.client.exec_command(command)

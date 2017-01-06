@@ -33,6 +33,20 @@ function on_click_container(s,c) {
     $(container_id).toggle();
 }
 
+function container_action(button) {
+    var server_info = button.childNodes[1].innerText;
+    //server_info = server_info.split(";");
+    $.ajax({
+        url: "/container_cmd/",
+        type: "POST",
+        data: JSON.stringify({
+            "info": server_info,
+        }),
+        contentType: "application/json",
+        dataType: "json",
+    });
+}
+
 function on_click_cmd(s, c, cmd) {
     var cmd_url = "/cmd/" + s + "/"  + c + "/" + cmd;
     $.ajax({
@@ -235,11 +249,14 @@ $(document).ready(function(){
     );
 
     socket.on("connect", function(msg) {
-        socket.emit("got event", {data: "Im connected!"});
+        socket.emit(
+            "connected", 
+            {data: "Im connected!",}
+        );
     });
 
 
-    socket.on("message", function(msg) {
+    socket.on("update_graph", function(msg) {
         update_graph(msg.cpu_usage);
     });
 

@@ -1,0 +1,8 @@
+<h1>Servers</h1>
+{% for s in servers %}
+<ul>
+    {% for c in containers[s] %}
+        <li> {{ c["name"] }} </li>
+    {% endfor %}
+</ul>
+{% endfor %}
