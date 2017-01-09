@@ -35,8 +35,26 @@ def main():
         "containers": containers,
         "server_info": server_info,
     }
-    #return render_template("dev_site.html", **vals)
     return render_template("index.html", **vals)
+
+@app.route("/get_info/")
+def get_info_r():
+    containers = {}
+    for s in config:
+        containers[s] = lxd_api.get_container_info(s)
+
+    ssh = SshApi(config)
+    server_info = {}
+    for s in config:
+        server_info[s] = ssh.get_server_info(s)
+
+    vals = {
+        "servers": config,
+        "containers": containers,
+        "server_info": server_info,
+    }
+    return jsonify(vals)
+    
 
 @app.route("/container_cmd/", methods=["POST"])
 def container_cmd_handler():
@@ -83,6 +101,7 @@ def _get_configuration():
 
     for server in cfg.servers:
         config[server.name] = {
+            "servername": server.name,
             "username": server.username,
             "password": server.password,
             "endpoint": server.endpoint,

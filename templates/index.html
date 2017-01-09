@@ -15,10 +15,15 @@
 <!-- content row -->
 <div class="row">
     <div class="col-md-3 bordered_container">
-        <main-listing></main-listing>
+        {% raw %}
+        <menu-servers ng-repeat="s in servers" server="s" server-click="openDetailsServer(s)">
+            <menu-containers ng-repeat="c in getContainersByServer(s.servername)" container="c" 
+            ng-click="openDetailsContainer(s, c)"></menu-containers>
+        </menu-servers>
+
+        {% endraw %}
     </div>
-    <div class="col-md-9 bordered_container">
-        <h2>details here</h2>
+    <div class="col-md-9 bordered_container" id="details_container">
     </div>
 </div>
 <!-- end content row -->
