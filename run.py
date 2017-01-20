@@ -49,9 +49,6 @@ def get_info_r():
     server_info = {}
     for s in config:
         server_info[s] = ssh.get_server_info(s)
-    print "c_t: %s" % c_t
-    print "s_t: %s" % s_t
-    print "ssh_t: %s" % ssh_t
     vals = {
         "servers": config,
         "containers": containers,
@@ -69,13 +66,11 @@ def container_cmd_handler():
         snap = req_data.get("snap")
         if req_data.get("type") == "container":
             lxd_api.exec_container_cmd(server, container, method)
-            print "cmd_t: %s" % cmd_t
             # get update container info after method
             c_info = get_container_info(server, container)
             return make_response(jsonify(c_info))
         elif req_data.get("type") == "snapshot":
             lxd_api.exec_snapshot_cmd(server, snap, container, method)
-            print "cmd_t: %s" % cmd_t
             c_info = get_container_info(server, container)
             return make_response(jsonify(c_info))
 
