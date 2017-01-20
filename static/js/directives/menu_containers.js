@@ -6,7 +6,7 @@ app.directive("menuContainers", function() {
             container: "=container",
         },
         templateUrl: "/static/js/directives/menu_containers.html",
-        link: function(scope, elem, attr, outercontrol) {
+        link: function($scope, elem, attr, outercontrol) {
             outercontrol.addItem(1);
         }
     }

@@ -1,20 +1,24 @@
 {% extends "main_template.html" %}
 {% block head %}
-<link href="{{url_for('static', filename='styles/index.css')}}" rel="stylesheet" />
+<link href="/static/styles/index.css" rel="stylesheet" />
 {% endblock %}
 {% block body %}
-<div class="col-md-10 col-md-offset-1 bordered_container">
+<div class="col-md-12">
 <!-- title row -->
-<div class="row bordered_container">
+<div class="row bg_green">
     <div class="col-md-12 center">
-        <h1>LXD Control Panel</h1>
+        <h1 style="color:white;">LXD Control Panel</h1>
     </div>
 </div>
 <!-- end title row -->
 
 <!-- content row -->
 <div class="row">
-    <div class="col-md-3 bordered_container">
+    <div class="col-md-3">
+        <!--
+        <h2><strong>general</strong></h2>
+        <h2><strong>containers</strong></h2>
+        -->
         {% raw %}
         <menu-servers ng-repeat="s in servers" server="s" server-click="openDetailsServer(s)">
             <menu-containers ng-repeat="c in getContainersByServer(s.servername)" container="c" 
@@ -23,7 +27,7 @@
 
         {% endraw %}
     </div>
-    <div class="col-md-9 bordered_container" id="details_container">
+    <div class="col-md-9 bg_d_white mt50" id="details_container">
     </div>
 </div>
 <!-- end content row -->

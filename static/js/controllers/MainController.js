@@ -5,24 +5,47 @@ function($scope, $http, $compile) {
     $scope.server_info = null,
     $scope.containers = null,
     $scope.container = null,
+    // Get data from server when loading page
     $http({
         method: "GET",
         url: "/get_info"
     })
         .then(
             function Success(response) {
-                console.log("response: ", response);
                 $scope.servers = response.data.servers;
-                console.log("servers: ", $scope.servers);
                 $scope.server_info = response.data.server_info;
-                console.log("server_info: ", $scope.server_info);
                 $scope.containers = response.data.containers;
+                console.log("response: ", response);
+                console.log("servers: ", $scope.servers);
+                console.log("server_info: ", $scope.server_info);
                 console.log("containers: ", $scope.containers);
             },
             function Error(response) {
                 console.log("Error getting data");
             }
         ),
+    $scope.updateData = function() {
+        console.log("updating")
+        $http({
+            method: "GET",
+            url: "/get_info"
+        })
+        .then(
+            function Success(response) {
+                $scope.servers = response.data.servers;
+                $scope.server_info = response.data.server_info;
+                $scope.containers = response.data.containers;
+                console.log("response: ", response);
+                console.log("servers: ", $scope.servers);
+                console.log("server_info: ", $scope.server_info);
+                console.log("containers: ", $scope.containers);
+            },
+            function Error(response) {
+                console.log("Error getting data");
+            }
+        )
+    },
+    // Get functions
     $scope.getContainersByServer = function(servername) {
         return $scope.containers[servername];
     },
@@ -37,20 +60,30 @@ function($scope, $http, $compile) {
             }
         }
     },
+    // Load detail directives on menu item click 
     $scope.openDetailsContainer = function(server, container) {
-        var compiledHtml = $compile(
-            '<details_container container="getContainerByName(\'' +
-            server.servername +
-            '\',\'' +
-            container.name +
-            '\')"></details_container>')($scope);
+        var compiledHtml = $compile(String(
+            '<details_container container="getContainerByName(\'-s1-\',\'-c1-\')"' +
+            'server="getServerByName(\'-s2-\')" ' +
+            'callback-fn="updateData()" ' +
+            '></details_container>')
+                .replace("-s1-", server.servername)
+                .replace("-s2-", server.servername)
+                .replace("-s3-", JSON.stringify(server))
+                .replace("-c1-", container.name)
+                .replace("-c2-", JSON.stringify(container))
+        )($scope);
         $("#details_container").html(compiledHtml);
     },
     $scope.openDetailsServer = function(server) {
-        var compiledHtml = $compile(
-            '<details_server server="getServerByName(\'' +
-            server.servername +
-            '\')"></details_server>')($scope);
+        var compiledHtml = $compile(String(
+            '<details_server ' + 
+            'server="getServerByName(\'-s1-\')" ' +
+            'containers="getContainersByServer(\'-s2-\')"' +
+            '></details_server>')
+                .replace("-s1-", server.servername)
+                .replace("-s2-", server.servername)
+            )($scope);
         $("#details_container").html(compiledHtml);
     };
 }]);

@@ -5,6 +5,7 @@ app.directive("menuServers", function() {
         scope: {
             server: "=server",
             serverClick: "&",
+            myStyle: "=myStyle",
         },
         templateUrl: "/static/js/directives/menu_servers.html",
         controller: function($scope) {
@@ -12,7 +13,8 @@ app.directive("menuServers", function() {
                 console.log(val);
             }
         },
-        link: function(scope, elem, attrs) {
+        link: function($scope, elem, attrs) {
+            $scope.toggle = true;
         }
     }
 });

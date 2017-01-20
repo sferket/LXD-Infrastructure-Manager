@@ -6,6 +6,7 @@ from ws4py.client import WebSocketBaseClient
 from ws4py.manager import WebSocketManager
 import json
 import time
+from application.api.ssh_api import SshApi
 
 m = WebSocketManager()
 
@@ -80,7 +81,8 @@ class LxdApi(object):
                 "status": cont.status,
                 "status_code": cont.status_code,
                 "stateful": cont.stateful,
-                "snapshots": self.get_snapshot_list(cont, cont.name)
+                "snapshots": self.get_snapshot_list(cont, cont.name),
+                "mac": cont.expanded_config["volatile.eth0.hwaddr"]
                }
             cont_names.append(data_dict)
         return cont_names
@@ -98,12 +100,15 @@ class LxdApi(object):
             container.freeze()
         elif cmd == "unfreeze":
             container.unfreeze()
+
+        elif cmd == "delete":
+            return self.delete_container(server, name)
         elif cmd == "create_snapshot":
-            res = self.create_snapshot(container, name)
+            return self.create_snapshot(container, name)
         elif cmd == "get_snapshots":
-            res = self.get_snapshot_list(container, name)
+            return self.get_snapshot_list(container, name)
         elif cmd == "delete_snapshot":
-            res = self.delete_snapshot(container, name, "snapname")
+            return self.delete_snapshot(container, name, "snapname")
 
         return 0
 
@@ -111,15 +116,14 @@ class LxdApi(object):
     def exec_snapshot_cmd(self, server, snap, name, cmd, **kwargs):
         ws_client = kwargs["ws_client"]
         container = ws_client.containers.get(name)
-
         if cmd == "delete":
             res = self.delete_snapshot(container, name, snap)
         elif cmd == "activate":
-            res = self.activate_snapshot(container, name, snap)
+            res = self.activate_snapshot(server, container, name, snap)
 
     def create_snapshot(self, container, c_name):
         try:
-            snap_name = "%s_%s" % (c_name, time.strftime("%Y%m%d%H%M%S"))
+            snap_name = "%s-%s" % (c_name, time.strftime("%d%H%M%S"))
             container.snapshots.create(snap_name)
             return "Finished creating snapshot"
         except Exception as e:
@@ -134,15 +138,25 @@ class LxdApi(object):
         except Exception as e:
             return "Error getting snapshot list: %s" % e
 
-    def activate_snapshot(self, container, c_name, s_name):
+    @use_client
+    def activate_snapshot(self, server, container, c_name, s_name, **kwargs):
         try:
-            container.execute([
-                "copy",
-                "%s/%s" % (c_name, s_name),
-                s_name,
-                "test123"
-            ])
-            return "Finished activating snapshot"
+            # activate snapshot
+            ssh = SshApi(self.config)
+            cmd = "lxc copy {c_name}/{s_name} {s_name}"
+            stdin, stdout, stderr = ssh.execute_ssh_command(
+                server,
+                cmd.format(**{"c_name":c_name, "s_name": s_name})
+            )
+
+            # switch activad snapshot profile
+            ssh = SshApi(self.config)
+            cmd = "lxc profile apply {s_name} default2"
+            stdin, stdout, stderr = ssh.execute_ssh_command(
+                server,
+                cmd.format(**{"s_name":s_name})
+            )
+            return stdin, stdout, stderr
         except Exception as e:
             return "Error activating snapshot: %s" % e
 
@@ -154,3 +168,15 @@ class LxdApi(object):
             return "Deleted %s" % s_name
         except Exception as e:
             return "Error deleting snapshot: %s" % e
+
+    def delete_container(self, server, c_name):
+        try:
+            ssh = SshApi(self.config)
+            cmd = "lxc delete {c_name}"
+            stdin, stdout, stderr = ssh.execute_ssh_command(
+                server,
+                cmd.format(**{"c_name":c_name})
+            )
+            return stdin, stdout, stderr
+        except Exception, e:
+            return "Error deleting container: %s" % e

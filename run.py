@@ -3,6 +3,8 @@ from flask import render_template
 from flask import jsonify
 from flask import session
 from flask import request
+from flask import Response
+from flask import make_response
 from application.socket import lxd_socketio
 from application.api import LxdApi
 from application.api import SshApi
@@ -47,41 +49,44 @@ def get_info_r():
     server_info = {}
     for s in config:
         server_info[s] = ssh.get_server_info(s)
-
+    print "c_t: %s" % c_t
+    print "s_t: %s" % s_t
+    print "ssh_t: %s" % ssh_t
     vals = {
         "servers": config,
         "containers": containers,
         "server_info": server_info,
     }
     return jsonify(vals)
-    
 
 @app.route("/container_cmd/", methods=["POST"])
 def container_cmd_handler():
     if request.method == "POST":
         req_data = request.get_json()
-        info_lst = req_data["info"]\
-            .replace("\n","")\
-            .replace(" ","")\
-            .split(";")
-        # initiate variables
-        server, container, cmd, method, snap = (None for i in range(5))
-        if len(info_lst) == 4:
-            #container level method
-            server, container, cmd, method = info_lst
-        if len(info_lst) == 5:
-            # snapshot level method
-            server, container, cmd, method, snap = info_lst
-
-        if cmd == "cmd":
+        server = req_data.get("server")
+        container = req_data.get("container")
+        method = req_data.get("method")
+        snap = req_data.get("snap")
+        if req_data.get("type") == "container":
             lxd_api.exec_container_cmd(server, container, method)
-        elif cmd == "snap_cmd":
+            print "cmd_t: %s" % cmd_t
+            # get update container info after method
+            c_info = get_container_info(server, container)
+            return make_response(jsonify(c_info))
+        elif req_data.get("type") == "snapshot":
             lxd_api.exec_snapshot_cmd(server, snap, container, method)
-        elif cmd == "get_info":
-            #TODO is this used?
-            containers = {}
-            for s in config:
-                containers[s] = lxd_api.get_container_info(s)
+            print "cmd_t: %s" % cmd_t
+            c_info = get_container_info(server, container)
+            return make_response(jsonify(c_info))
+
+def get_container_info(server, container):
+    field_translations = {
+        "name": "name",
+
+    }
+    for c in lxd_api.get_container_info(server):
+        if c["name"] == container:
+            return c
 
 @socketio.on("connected", namespace="/update")
 def got_event(msg):
