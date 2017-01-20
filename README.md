@@ -32,6 +32,10 @@ On LXD server:
 Optionally,if not done during init:  Enable:
 lxc config set core.https_address "[::]:8443"
 
+For now we still need local accoutn to ssh to:
+adduser lxd_panel
+adduser lxd_panel lxd
+
 Add certificatee to trust:
 lxc config trust list
 lxc config trust add /root/.config/lxc/client.crt
