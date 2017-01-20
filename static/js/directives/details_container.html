@@ -1,20 +1,27 @@
-<!--
 <div class="modal fade" id="createsnap-modal"tabindex="-1" role="dialog">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
-            <div class="modal-header">
-                <p>Create snapshot</p>
+            <div class="modal-header bg_green center">
+                <h3 class="modal-title"><strong>Create snapshot</strong></h3>
             </div>
             <div class="modal-body">
-                <p>Body</p>
+                <div class="input-group">
+                    <span class="input-group-addon" id="snap-input-desc">Snapshot name:</span>
+                    <input type="text" class="form-control" placeholder="Name" aria-describedby="snap-input-desc" id="tar_name" />
+                </div>
             </div>
             <div class="modal-footer">
-                <p>Footer</p>
+                <button class="col-xs-3 col-xs-offset-6" 
+                ng-click="runContainerMethod(server.servername, container.name, 'create_snapshot', 'container', '')">
+                    <h5>Create</h5>
+                </button>
+                <button class="col-xs-3" data-dismiss="modal">
+                    <h5>Cancel</h5>
+                </button>
             </div>
         </div>
     </div>
 </div>
--->
 
 <div class="row">
     <div class="col-xs-12 bg_green center">
@@ -23,8 +30,7 @@
         </div>
     </div>
     <div class="col-xs-12 mt25">
-        <button class="col-xs-3 col-xs-offset-6" 
-        ng-click="runContainerMethod(server.servername, container.name, 'create_snapshot', 'container', '')">
+        <button class="col-xs-3 col-xs-offset-6" type="button" data-toggle="modal" data-target="#createsnap-modal">
             <h5>
                 <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
                 <strong>Create snapshot</strong>

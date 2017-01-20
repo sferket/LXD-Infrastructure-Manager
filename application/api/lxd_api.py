@@ -88,7 +88,7 @@ class LxdApi(object):
         return cont_names
 
     @use_client
-    def exec_container_cmd(self, server, name, cmd, **kwargs):
+    def exec_container_cmd(self, server, name, cmd, tar_name, **kwargs):
         ws_client = kwargs["ws_client"]
         container = ws_client.containers.get(name)
 
@@ -104,7 +104,7 @@ class LxdApi(object):
         elif cmd == "delete":
             return self.delete_container(server, name)
         elif cmd == "create_snapshot":
-            return self.create_snapshot(container, name)
+            return self.create_snapshot(container, name, tar_name)
         elif cmd == "get_snapshots":
             return self.get_snapshot_list(container, name)
         elif cmd == "delete_snapshot":
@@ -121,10 +121,10 @@ class LxdApi(object):
         elif cmd == "activate":
             res = self.activate_snapshot(server, container, name, snap)
 
-    def create_snapshot(self, container, c_name):
+    def create_snapshot(self, container, c_name, tar_name):
         try:
-            snap_name = "%s-%s" % (c_name, time.strftime("%d%H%M%S"))
-            container.snapshots.create(snap_name)
+            #snap_name = "%s-%s" % (c_name, time.strftime("%d%H%M%S"))
+            container.snapshots.create(tar_name)
             return "Finished creating snapshot"
         except Exception as e:
             return "Error creating snapshot: %s" % e

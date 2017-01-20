@@ -64,8 +64,9 @@ def container_cmd_handler():
         container = req_data.get("container")
         method = req_data.get("method")
         snap = req_data.get("snap")
+        tar_name = '' or req_data.get("tar_name")
         if req_data.get("type") == "container":
-            lxd_api.exec_container_cmd(server, container, method)
+            lxd_api.exec_container_cmd(server, container, method, tar_name)
             # get update container info after method
             c_info = get_container_info(server, container)
             return make_response(jsonify(c_info))
