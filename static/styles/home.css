@@ -32,17 +32,26 @@
 }
 
 .Running_bg {
-    background-color: #6CD994;
+    background-color: #B2E6A1;
 }
 
 .Stopped_bg {
-    background-color: #D96C6C;
+    background-color: #E6A1A1;
 }
 
 .Frozen_bg {
-    background-color: #6CD9D3;
+    background-color: #A1C2E6;
 }
 
 td {
     color: #2E2E2E;
-    }
+}
+
+.center-text {
+    text-align: center;
+}
+
+.pad5p {
+    padding-top: 5px;
+    padding-bottom: 5px;
+}

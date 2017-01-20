@@ -1,0 +1,53 @@
+<div class="row">
+    <div class="col-xs-12 center bg_green">
+        <h1 class="m0">[[server.servername]]</h1>
+    </div>
+</div>
+
+<div class="row mt25">
+    <div class="col-xs-10 col-xs-offset-1 mt25 bg_green center">
+        <div class="col-xs-2">
+            <h4 class="m0"><strong>Name</strong></h4>
+        </div>
+        <div class="col-xs-2">
+            <h4 class="m0"><strong>Status</strong></h4>
+        </div>
+        <div class="col-xs-8">
+            <h4 class="m0"><strong>Controls</strong></h4>
+        </div>
+    </div>
+    <div class="col-xs-10 col-xs-offset-1 center" ng-repeat="c in containers | orderBy:'status'" style="border-bottom:1px solid black;">
+        <div class="col-xs-2">
+            <h5>[[c.name]]</h5>
+        </div>
+        <div class="col-xs-2">
+            <h5>[[c.status]]</h5>
+        </div>
+        <div class="col-xs-8">
+            <button class="col-xs-3" ng-click="runContainerMethod(server, c, 'start')">
+                <h5>
+                    <span class="glyphicon glyphicon-play" aria-hidden="true"></span>
+                    <strong>start</strong>
+                </h5>
+            </button>
+            <button class="col-xs-3" ng-click="runContainerMethod(server, c, 'stop')">
+                <h5>
+                    <span class="glyphicon glyphicon-stop" aria-hidden="true"></span>
+                   <strong> stop</strong>
+                </h5>
+            </button>
+            <button class="col-xs-3" ng-click="runContainerMethod(server, c, 'freeze')">
+                <h5>
+                    <span class="glyphicon glyphicon-asterisk" aria-hidden="true"></span>
+                    <strong>freeze</strong>
+                </h5>
+            </button>
+            <button class="col-xs-3" ng-click="runContainerMethod(server, c, 'unfreeze')">
+                <h5>
+                    <span class="glyphicon glyphicon-tint" aria-hidden="true"></span>
+                    <strong>unfreeze</strong>
+                </h5>
+            </button>
+        </div>
+    </div>
+</div>

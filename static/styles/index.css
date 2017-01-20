@@ -1,0 +1,82 @@
+body {
+    font-family: Tahoma,"Lucida Console",Monaco,monospace !important;
+}
+
+.bordered_container {
+    border:1px solid black;
+}
+
+.center {
+    text-align: center;
+}
+
+.hide {
+    display: none;
+}
+
+.bg_white{
+    background-color: white;
+}
+
+.bg_d_white{
+    background-color: #f5f5f5;
+}
+
+.bg_green {
+    color: white;
+    background-color: #7CAD6C;
+}
+
+.bg_d_green {
+    color: white;
+    background-color: #527546;
+}
+
+.bg_gray {
+    background-color: #ebebeb;
+}
+
+.bg_red {
+    color: white;
+    background-color: #E82525;
+}
+
+li {
+    list-style: none;
+}
+
+.link_cursor {
+    cursor: pointer;
+    cursor: hand;
+}
+
+.link_cursor:hover {
+    color: #7CAD6C;
+}
+
+.m0 {
+    margin-top:0px;
+    margin-left:0px;
+    margin-bottom:0px;
+    margin-right:0px;
+}
+
+.mr5{
+    margin-right: 5px;
+}
+
+.mt5{
+    margin-top: 5px;
+}
+
+.mt25{
+    margin-top: 25px;
+}
+
+.mt50{
+    margin-top: 50px;
+}
+
+.pt10{
+    padding-top: 10px;
+}

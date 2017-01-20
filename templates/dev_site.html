@@ -1,0 +1,68 @@
+{% extends "main_template.html" %}
+{% block body %}
+
+<ul>
+    {% for s in servers %}
+        <li>{{s}}</li>
+        <ul>
+            {% for c in containers[s] %}
+            <li>
+            <p>
+                {{c["name"]}}
+                -
+                {{c["status"]}}
+                <button id="{{s}}_{{c['name']}}_startbutton"
+                onclick="javascript:container_action(this)">
+                    <p style="display:none">{{s}};{{c["name"]}};cmd;start</p>
+                    start
+                </button>
+                <button id="{{s}}_{{c['name']}}_stopbutton"
+                onclick="javascript:container_action(this)">
+                    <p style="display:none">{{s}};{{c["name"]}};cmd;stop</p>
+                    stop
+                </button>
+                <button id="{{s}}_{{c['name']}}_freezebutton"
+                onclick="javascript:container_action(this)">
+                    <p style="display:none">{{s}};{{c["name"]}};cmd;freeze</p>
+                    freeze 
+                </button>
+                <button id="{{s}}_{{c['name']}}_unfreezebutton"
+                onclick="javascript:container_action(this)">
+                    <p style="display:none">{{s}};{{c["name"]}};cmd;unfreeze</p>
+                    unfreeze 
+                </button>
+                <button id="{{s}}_{{c['name']}}_createsnapbutton"
+                onclick="javascript:container_action(this)">
+                    <p style="display:none">{{s}};{{c["name"]}};cmd;create_snapshot</p>
+                    create snap 
+                </button>
+            </p>
+            <ul>
+                {% for snap in c["snapshots"] %}
+                    <li>
+                        {{snap}}
+                        <button onclick="javascript:container_action(this)">
+                        <p style="display:none">
+                        {{s}};{{c["name"]}};snap_cmd;activate;{{snap}}
+                        </p>
+                           Activate 
+                        </button>
+                        <button onclick="javascript:container_action(this)">
+                        <p style="display:none">
+                        {{s}};{{c["name"]}};snap_cmd;delete;{{snap}}
+                        </p>
+                            Delete
+                        </button>
+                    </li>
+                {% endfor %}
+            </ul>
+            {% endfor %}
+        </ul>
+    {% endfor %}
+</ul>
+
+{% endblock %}
+{% block scripts %}
+<script src="{{url_for('static',filename='js/home.js')}}"></script>
+{% endblock %}
+
