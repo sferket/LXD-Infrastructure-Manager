@@ -13,7 +13,7 @@ app.directive("detailsServer", ["$http", function($http) {
                     "server": server.servername,
                     "container": container.name,
                     "method": method,
-                    "type": "container"
+                    "type": "container",
                 };
                 data = JSON.stringify(data);
                 var config = {

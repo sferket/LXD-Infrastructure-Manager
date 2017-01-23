@@ -7,11 +7,11 @@
             <div class="modal-body">
                 <div class="input-group">
                     <span class="input-group-addon" id="snap-input-desc">Snapshot name:</span>
-                    <input type="text" class="form-control" placeholder="Name" aria-describedby="snap-input-desc" id="tar_name" />
+                    <input type="text" class="form-control" placeholder="Name" aria-describedby="snap-input-desc" id="tar_snap"/>
                 </div>
             </div>
             <div class="modal-footer">
-                <button class="col-xs-3 col-xs-offset-6" 
+                <button class="col-xs-3 col-xs-offset-6" data-dismiss="modal"
                 ng-click="runContainerMethod(server.servername, container.name, 'create_snapshot', 'container', '')">
                     <h5>Create</h5>
                 </button>
@@ -50,11 +50,13 @@
         <h5><strong>Status:</strong></h5> 
         <h5><strong>Server:</strong></h5> 
         <h5><strong>Mac:</strong></h5> 
+        <h5><strong>IP:</strong></h5> 
     </div>
     <div class="col-xs-3">
         <h5>[[container.status]]</h5>
         <h5>[[server.servername]]</h5>
         <h5>[[container.mac]]</h5>
+        <h5>[[container.container_ip]]</h5>
     </div>
     <div class="col-xs-2 col-xs-offset-1">
         <h5><strong>Architecture:</strong></h5> 
@@ -107,12 +109,43 @@
     <div class="col-xs-12 mt25">
         <div class="col-xs-10 col-xs-offset-1">
             <div class="col-xs-12 mt5" ng-repeat="s in container.snapshots" style="border-bottom:1px solid rgba(0,0,0,.5);">
+<div class="modal fade" id="activatesnap-modal"tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg_green center">
+                <h3 class="modal-title"><strong>Activate snapshot</strong></h3>
+            </div>
+            <div class="modal-body">
+                <div class="input-group">
+                    <span class="input-group-addon" id="cont-input-desc">Container name:</span>
+                    <input type="text" class="form-control" placeholder="..." aria-describedby="cont-input-desc" id="tar_cont" />
+                </div>
+                <div class="input-group">
+                    <span class="input-group-addon" id="prof-input-desc">Profile:</span>
+                    <select id="tar_prof">
+                        <option ng-repeat="p in container.available_profiles" value=[[p]]>[[p]]</option>
+                    </select>
+                    <!--<input type="text" class="form-control" placeholder="profile.." aria-describedby="prof-input-desc" id="tar_prof" />-->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button  class="col-xs-3" data-dismiss="modal"
+                    ng-click="runContainerMethod(server.servername, container.name, 'activate', 'snapshot', s)">
+                    <h5>Activate</h5>
+                </button>
+                <button class="col-xs-3" data-dismiss="modal">
+                    <h5>Cancel</h5>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
                 <div class="col-xs-4">
                     <h5>[[s]]</h5> 
                 </div>
                 <div class="col-xs-8">
-                    <button  class="col-xs-6"
-                    ng-click="runContainerMethod(server.servername, container.name, 'activate', 'snapshot', s)">
+                    <button class="col-xs-6" type="button" data-toggle="modal" data-target="#activatesnap-modal"
+                    ng-click="update_tar_cont(s);">
                         <h5>
                             <span class="glyphicon glyphicon-flash" aria-hidden="true"></span>
                             <strong>activate</strong>
