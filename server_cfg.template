@@ -1,24 +1,14 @@
-
-server_auth:
-{
-        username: "<username>",
-        password: "<password>",
-}
-
 servers:
 [
     { 
         name: "<server name>"
-        endpoint: "https://ip:port"
+        username: "<username>"
+        password: "<password>"
+        endpoint: "https://<server ip>:<port>"
         verify: False
-        keyfile : "path/to/key.key"
-        certfile : "path/to/crt.crt" 
-    }
-    { 
-        name: "<server name>"
-        endpoint: "https://ip:port"
-        verify: False
-        keyfile : "path/to/key.key"
-        certfile : "path/to/crt.crt" 
+        keyfile : <path to keyfile> # example: "application/keys/client.key"
+        certfile : <path to certfile> #"application/certs/client_eng1-lxd1.crt" 
+        excluded_containers: ["exclude1","exclude2"]
+        available_profiles: ["profile", "profile2"]
     }
 ]

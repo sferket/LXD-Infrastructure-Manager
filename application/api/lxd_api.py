@@ -59,14 +59,43 @@ class LxdApi(object):
 
     def set_config(self, config):
         self.config = config
+        self.excluded_containers = self._set_excluded_containers()
+
+    def _set_excluded_containers(self):
+        excluded_containers = {}
+        for server in self.config:
+            containers = self.config[server].get("excluded_containers")
+            excluded_containers[server] = containers
+        return excluded_containers
+
+    def _check_excluded_container(self, server, container):
+        # check if container is in excluded_containers config
+        if container.name in self.excluded_containers[server]:
+            return True
+        return False
 
     @use_client
     def get_container_info(self, server, **kwargs):
         ws_client = kwargs["ws_client"]
+        #print "###: %s" % ws_client.api.containers["stefaan1/state"].get().json()
         ws_client.api.operations[0]
 
         cont_names = []
         for cont in ws_client.containers.all():
+            if self._check_excluded_container(server, cont):
+                continue
+            x = ContainerInfo(ws_client, cont.name)
+            #print "x.metadata: %s" % x.metadata
+            #print "x: %s" % x.metadata["network"]["eth0"]
+            network = x.metadata["network"]
+
+            container_ip = ""
+            if network:
+                eth = network.get("eth0")
+                if eth:
+                    for adr in eth["addresses"]:
+                        if adr.get("family") == "inet":
+                            container_ip = adr["address"]
             cont.fetch()
             data_dict = {
                 "architecture": cont.architecture,
@@ -82,7 +111,9 @@ class LxdApi(object):
                 "status_code": cont.status_code,
                 "stateful": cont.stateful,
                 "snapshots": self.get_snapshot_list(cont, cont.name),
-                "mac": cont.expanded_config["volatile.eth0.hwaddr"]
+                "mac": cont.expanded_config["volatile.eth0.hwaddr"],
+                "container_ip": container_ip,
+                "available_profiles": self.config[server]["available_profiles"]
                }
             cont_names.append(data_dict)
         return cont_names
@@ -113,13 +144,13 @@ class LxdApi(object):
         return 0
 
     @use_client
-    def exec_snapshot_cmd(self, server, snap, name, cmd, **kwargs):
+    def exec_snapshot_cmd(self, server, snap, name, cmd, tar_cont, tar_prof, **kwargs):
         ws_client = kwargs["ws_client"]
         container = ws_client.containers.get(name)
         if cmd == "delete":
             res = self.delete_snapshot(container, name, snap)
         elif cmd == "activate":
-            res = self.activate_snapshot(server, container, name, snap)
+            res = self.activate_snapshot(server, container, name, snap, tar_cont, tar_prof)
 
     def create_snapshot(self, container, c_name, tar_name):
         try:
@@ -139,23 +170,30 @@ class LxdApi(object):
             return "Error getting snapshot list: %s" % e
 
     @use_client
-    def activate_snapshot(self, server, container, c_name, s_name, **kwargs):
+    def activate_snapshot(self, server, container, c_name, s_name, tar_cont, tar_prof, **kwargs):
         try:
             # activate snapshot
             ssh = SshApi(self.config)
-            cmd = "lxc copy {c_name}/{s_name} {s_name}"
+            cmd = "lxc copy {c_name}/{s_name} {tar_cont}"
             stdin, stdout, stderr = ssh.execute_ssh_command(
                 server,
-                cmd.format(**{"c_name":c_name, "s_name": s_name})
+                cmd.format(**{
+                    "c_name":c_name,
+                    "s_name": s_name,
+                    "tar_cont": tar_cont
+                    }
+                )
             )
+            print "stderr: %s" % stderr
 
             # switch activad snapshot profile
             ssh = SshApi(self.config)
-            cmd = "lxc profile apply {s_name} default2"
+            cmd = "lxc profile apply {tar_cont} {tar_prof}"
             stdin, stdout, stderr = ssh.execute_ssh_command(
                 server,
-                cmd.format(**{"s_name":s_name})
+                cmd.format(**{"tar_cont":tar_cont, "tar_prof": tar_prof})
             )
+            print "stderr: %s" % stderr
             return stdin, stdout, stderr
         except Exception as e:
             return "Error activating snapshot: %s" % e
@@ -180,3 +218,33 @@ class LxdApi(object):
             return stdin, stdout, stderr
         except Exception, e:
             return "Error deleting container: %s" % e
+
+
+class ContainerInfo(object):
+
+    def __init__(self, ws_client, container_name):
+        self.resp = self._get_container_info(ws_client, container_name)
+        self._parse_container_info()
+
+    def _get_container_info(self, client, name):
+        container = client.api.containers["%s/state" % name]
+        res = container.get().json()
+        return res
+
+    def _parse_container_info(self):
+        #self.data = self.Data(self, self.resp)
+        for k, v in self.resp.iteritems():
+            setattr(self, k, v)
+
+    class Data(object):
+        def __init__(self, parent, data):
+            self.data = data
+            self.parent = parent
+            self._parse_data()
+
+        def _parse_data(self):
+            for k, v in self.data.iteritems():
+                if isinstance(v, dict):
+                    setattr(self.parent, k, ContainerInfo.Data(self, v))
+                else:
+                    setattr(self, k, v)

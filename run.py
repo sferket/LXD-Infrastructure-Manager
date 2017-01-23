@@ -64,14 +64,17 @@ def container_cmd_handler():
         container = req_data.get("container")
         method = req_data.get("method")
         snap = req_data.get("snap")
-        tar_name = '' or req_data.get("tar_name")
+        tar_snap = req_data.get("tar_snap")
+        tar_cont = req_data.get("tar_cont")
+        tar_prof = req_data.get("tar_prof")
+        print "tar_prof: %s" % tar_prof
         if req_data.get("type") == "container":
-            lxd_api.exec_container_cmd(server, container, method, tar_name)
+            lxd_api.exec_container_cmd(server, container, method, tar_snap)
             # get update container info after method
             c_info = get_container_info(server, container)
             return make_response(jsonify(c_info))
         elif req_data.get("type") == "snapshot":
-            lxd_api.exec_snapshot_cmd(server, snap, container, method)
+            lxd_api.exec_snapshot_cmd(server, snap, container, method, tar_cont, tar_prof)
             c_info = get_container_info(server, container)
             return make_response(jsonify(c_info))
 
@@ -114,7 +117,9 @@ def _get_configuration():
                     random.randrange(255),
                     random.randrange(255),
                     random.randrange(255)
-            )
+            ),
+            "excluded_containers": tuple(server.excluded_containers),
+            "available_profiles": tuple(server.available_profiles)
         }
     return config
 
@@ -130,4 +135,4 @@ def config_app():
 
 if __name__ == "__main__":
     config_app()
-    socketio.run(app)
+    socketio.run(app, host="0.0.0.0")
