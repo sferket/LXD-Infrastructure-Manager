@@ -114,7 +114,8 @@ def _get_configuration():
                     random.randrange(255),
                     random.randrange(255),
                     random.randrange(255)
-            )
+            ),
+            "excluded_containers": tuple(server.excluded_containers),
         }
     return config
 
