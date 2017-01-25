@@ -1,12 +1,13 @@
 # -*- encoding: utf-8 -*-
 from pylxd import client
 from pylxd import exceptions
-from pylxd import operation
+#from pylxd import operation
 from ws4py.client import WebSocketBaseClient
 from ws4py.manager import WebSocketManager
 import json
 import time
 from application.api.ssh_api import SshApi
+import math
 
 m = WebSocketManager()
 
@@ -52,6 +53,51 @@ def use_client(func):
         return res
     return func_wrapper
 
+class ContainerInfo(object):
+
+    def __init__(self, ws_client, container_name):
+        self.resp = self._get_container_info(ws_client, container_name)
+        self._parse_container_info()
+
+    def convert_size(self, size_bytes):
+        if not isinstance( size_bytes, ( int, long ) ) :
+            try:
+                size_bytes = int(size_bytes)
+            except ValueError:
+                size_bytes = 0   
+         
+        if (size_bytes == 0):
+            return '0B'
+        size_name = ("B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB")
+        i = int(math.floor(math.log(size_bytes, 1024)))
+        p = math.pow(1024, i)
+        s = round(size_bytes/p, 2)
+        return '%s %s' % (s, size_name[i])
+
+    def _get_container_info(self, client, name):
+        container = client.api.containers["%s/state" % name]
+        res = container.get().json()
+        return res
+
+    def _parse_container_info(self):
+        for k, v in self.resp.get('metadata',{}).iteritems():
+            
+            if k == 'network':
+                if v:
+                    eth = v.get("eth0")
+                    if eth:
+                        for adr in eth["addresses"]:
+                            if adr.get("family") == "inet":
+                                v = adr["address"]                        
+            
+            if k == 'memory':
+                for k1 in v:
+                    self.convert_size(v.get(k1))
+                    v.update({k1:self.convert_size(v.get(k1))})
+                
+            setattr(self, k, v if v else 'NA')
+
+
 class LxdApi(object):
 
     def __init__(self):
@@ -67,7 +113,11 @@ class LxdApi(object):
 
         cont_names = []
         for cont in ws_client.containers.all():
-            cont.fetch()
+            if cont.name in self.config.get(server).get('excluded_containers', ()):
+                continue 
+            
+            x = ContainerInfo(ws_client, cont.name)   
+            #print x.metadata["network"]        
             data_dict = {
                 "architecture": cont.architecture,
                 "config": cont.config,
@@ -82,7 +132,9 @@ class LxdApi(object):
                 "status_code": cont.status_code,
                 "stateful": cont.stateful,
                 "snapshots": self.get_snapshot_list(cont, cont.name),
-                "mac": cont.expanded_config["volatile.eth0.hwaddr"]
+                "mac": cont.expanded_config["volatile.eth0.hwaddr"],
+                "inet" : x.network,
+                "memory" : x.memory
                }
             cont_names.append(data_dict)
         return cont_names
@@ -140,25 +192,17 @@ class LxdApi(object):
 
     @use_client
     def activate_snapshot(self, server, container, c_name, s_name, **kwargs):
-        try:
-            # activate snapshot
-            ssh = SshApi(self.config)
-            cmd = "lxc copy {c_name}/{s_name} {s_name}"
-            stdin, stdout, stderr = ssh.execute_ssh_command(
-                server,
-                cmd.format(**{"c_name":c_name, "s_name": s_name})
-            )
+        ws_client = kwargs["ws_client"]
+        data = {
+            "name": s_name,
+        #    "profiles": ["default"],
+            "source": {"type": "copy",                                                      # Can be: "image", "migration", "copy" or "none"
+                       "source": "%s/%s" % (c_name,s_name)}                                        # Name of the source container
+        }
+        ret = ws_client.containers.create(data, wait=False)
+        
+        return "Success"
 
-            # switch activad snapshot profile
-            ssh = SshApi(self.config)
-            cmd = "lxc profile apply {s_name} default2"
-            stdin, stdout, stderr = ssh.execute_ssh_command(
-                server,
-                cmd.format(**{"s_name":s_name})
-            )
-            return stdin, stdout, stderr
-        except Exception as e:
-            return "Error activating snapshot: %s" % e
 
     def delete_snapshot(self, container, c_name, s_name):
         try:
