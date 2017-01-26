@@ -3,7 +3,8 @@ app.directive("detailsServer", ["$http", function($http) {
         restrict: "E",
         scope: {
             server: "=server",
-            containers: "=containers"
+            containers: "=containers",
+            server_info: "=serverinfo",	
         },
         templateUrl: "/static/js/directives/details_server.html",
         link: function($scope, elem, attr) {

@@ -52,6 +52,9 @@ function($scope, $http, $compile) {
     $scope.getServerByName = function(name) {
         return $scope.servers[name];
     },
+    $scope.getServerInfoByName = function(name) {
+        return $scope.server_info[name];
+    },
     $scope.getContainerByName = function(server, name) {
         var containers = $scope.getContainersByServer(server);
         for (c_index in containers){ 
@@ -79,11 +82,14 @@ function($scope, $http, $compile) {
         var compiledHtml = $compile(String(
             '<details_server ' + 
             'server="getServerByName(\'-s1-\')" ' +
-            'containers="getContainersByServer(\'-s2-\')"' +
+            'serverinfo="getServerInfoByName(\'-s2-\')" ' +
+            'containers="getContainersByServer(\'-s3-\')"' +
             '></details_server>')
                 .replace("-s1-", server.servername)
                 .replace("-s2-", server.servername)
+                .replace("-s3-", server.servername)
             )($scope);
+        console.log($scope.getServerInfoByName(server.servername));
         $("#details_container").html(compiledHtml);
     };
 }]);

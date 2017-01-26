@@ -7,7 +7,7 @@ from ws4py.manager import WebSocketManager
 import json
 import time
 from application.api.ssh_api import SshApi
-import math
+from application.helpers import convert_size
 
 m = WebSocketManager()
 
@@ -59,21 +59,6 @@ class ContainerInfo(object):
         self.resp = self._get_container_info(ws_client, container_name)
         self._parse_container_info()
 
-    def convert_size(self, size_bytes):
-        if not isinstance( size_bytes, ( int, long ) ) :
-            try:
-                size_bytes = int(size_bytes)
-            except ValueError:
-                size_bytes = 0   
-         
-        if (size_bytes == 0):
-            return '0B'
-        size_name = ("B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB")
-        i = int(math.floor(math.log(size_bytes, 1024)))
-        p = math.pow(1024, i)
-        s = round(size_bytes/p, 2)
-        return '%s %s' % (s, size_name[i])
-
     def _get_container_info(self, client, name):
         container = client.api.containers["%s/state" % name]
         res = container.get().json()
@@ -92,8 +77,7 @@ class ContainerInfo(object):
             
             if k == 'memory':
                 for k1 in v:
-                    self.convert_size(v.get(k1))
-                    v.update({k1:self.convert_size(v.get(k1))})
+                    v.update({k1:convert_size(v.get(k1))})
                 
             setattr(self, k, v if v else 'NA')
 
@@ -214,13 +198,5 @@ class LxdApi(object):
             return "Error deleting snapshot: %s" % e
 
     def delete_container(self, server, c_name):
-        try:
-            ssh = SshApi(self.config)
-            cmd = "lxc delete {c_name}"
-            stdin, stdout, stderr = ssh.execute_ssh_command(
-                server,
-                cmd.format(**{"c_name":c_name})
-            )
-            return stdin, stdout, stderr
-        except Exception, e:
-            return "Error deleting container: %s" % e
+        print "Not implemented yet!!!"
+
