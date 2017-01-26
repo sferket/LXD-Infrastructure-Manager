@@ -32,6 +32,10 @@ def main():
     for s in config:
         server_info[s] = ssh.get_server_info(s)
 
+    #print server_info
+    for i in server_info.get("localhost"):
+        print '->%s' % i
+        
     vals = {
         "servers": config,
         "containers": containers,
