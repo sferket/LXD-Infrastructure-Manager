@@ -8,10 +8,13 @@ from flask import make_response
 from application.socket import lxd_socketio
 from application.api import LxdApi
 from application.api import SshApi
+from application.api.servers import Servers
+#from flask_socketio import SocketIO
 from config import Config
 import time
 import random
 import pdb
+import json
 
 
 app = Flask(__name__)
@@ -20,28 +23,31 @@ app.config["SECRET_KEY"] = "secret!" #TODO ACTUAL SECRET KEY
 socketio = lxd_socketio()
 lxd_api = LxdApi()
 global config
+thread = None
+servers = None
 
 @app.route("/")
 def main():
-    containers = {}
-    for s in config:
-        containers[s] = lxd_api.get_container_info(s)
-
-    ssh = SshApi(config)
-    server_info = {}
-    for s in config:
-        server_info[s] = ssh.get_server_info(s)
-
-    #print server_info
-    for i in server_info.get("localhost"):
-        print '->%s' % i
-        
-    vals = {
-        "servers": config,
-        "containers": containers,
-        "server_info": server_info,
-    }
-    return render_template("index.html", **vals)
+#     containers = {}
+#     for s in config:
+#         containers[s] = lxd_api.get_container_info(s)
+# 
+#     #ssh = SshApi(config)
+#     #server_info = {}
+#     #for s in config:
+#     #    server_info[s] = ssh.get_server_info(s)
+# 
+#     print '[[['
+#     print config
+#     print containers
+#     print ']]]'
+#     vals = {
+# #        "servers": config,
+# #        "containers": containers,
+# #        "server_info": server_info,
+#     }
+#    return render_template("index.html", **vals)
+    return render_template("index.html")
 
 @app.route("/get_info/")
 def get_info_r():
@@ -49,15 +55,13 @@ def get_info_r():
     for s in config:
         containers[s] = lxd_api.get_container_info(s)
 
-    ssh = SshApi(config)
-    server_info = {}
-    for s in config:
-        server_info[s] = ssh.get_server_info(s)
+    print containers
     vals = {
-        "servers": config,
+        "servers": servers.get_display_info(),
         "containers": containers,
-        "server_info": server_info,
+#        "server_info": server_info,
     }
+    
     return jsonify(vals)
 
 @app.route("/container_cmd/", methods=["POST"])
@@ -88,9 +92,29 @@ def get_container_info(server, container):
         if c["name"] == container:
             return c
 
+def update_thread():
+#    global servers
+    """Example of how to send server generated events to clients."""
+    count = 0
+    while True:
+        socketio.sleep(5)
+        count += 1
+        mes = {}
+        if servers:
+            for s in servers.get():
+                mes.update({s : servers.get(s).get_info()})
+            mes = json.dumps(mes)
+            
+            socketio.emit('my_response',
+                           mes,
+                          namespace='/update')
+        
 @socketio.on("connected", namespace="/update")
 def got_event(msg):
-    print "SocketIO connected!"
+    global thread
+    if thread is None:
+        thread = socketio.start_background_task(target=update_thread)
+    socketio.emit('my_response', {'data': 'Connected', 'count': 0})
 
 @app.after_request
 def add_header(response):
@@ -132,7 +156,19 @@ def config_app():
     socketio.init_app(app)
     socketio.set_lxd_config(config)
     lxd_api.set_config(config)
+# New
+    global servers
+    servers = Servers(config)
+    print '===========>%s' % servers.get()
+    for s in servers.get():
+        print s
+        print servers.get().get(s).get_info()
+        
+
+    #servers.execute_ssh_command()
+
 
 if __name__ == "__main__":
     config_app()
+    #socketio.run(app, use_reloader=False)
     socketio.run(app)
