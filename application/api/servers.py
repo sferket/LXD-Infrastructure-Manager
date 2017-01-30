@@ -6,6 +6,7 @@ from paramiko import RSAKey
 from application.helpers import convert_size
 import time
 import threading
+import re
 
 util.log_to_file("paramiko_log.log")
 
@@ -54,10 +55,11 @@ class Server(threading.Thread):
             "uptime" : "uptime",
             "lsb_release" : "lsb_release -a | grep Description",
             "meminfo": "cat /proc/meminfo",
-            "iostat": "iostat -c 1 3 | sed -e 's/,/./g' | tr -s ' ' ';' | sed '/^$/d' | tail -1"
+            "iostat": "iostat -c 1 3 | sed -e 's/,/./g' | tr -s ' ' ';' | sed '/^$/d' | tail -1",
+            "df": "df -hx devtmpfs -x tmpfs"
         }
         data = {}
-        cdata = {}
+        cdata = {'servername' : self.name}
         for k,v in data_paths.iteritems():
             stdin, stdout, stderr = self.execute_ssh_command(v)
             data[k] = stdout.readlines()
@@ -80,6 +82,21 @@ class Server(threading.Thread):
         cdata.update({'iowait' : ios[5]})
         cdata.update({'cpu' : str(int(100-float(ios[6])))})
         
+        disks = []
+        for d in data.get('df')[1:]:
+            dst = re.sub( '\s+', ' ', d ).strip().split(' ')
+            ds = {}
+            ds.update({'Filesystem' : dst[0]})
+            ds.update({'Size' : dst[1]})
+            ds.update({'Used' : dst[2]})
+            ds.update({'Avail' : dst[3]})
+            ds.update({'Use' : dst[4]})
+            ds.update({'MountedOn' : dst[5]})
+            disks += [ds]
+        
+        cdata.update({'disks' : disks})
+        
+        print disks
         self.info = cdata
             
     def get_info(self, attr=None, val_if_null=None):
@@ -109,5 +126,7 @@ class Servers(object):
     def get_display_info(self):
         d = {}
         for s in self.servers:
-            d.update({s:{'servername' : self.servers.get(s).name } })
+            #d.update({s:{'servername' : self.servers.get(s).name } })
+            #print '++>%s' % 
+            d.update({s: self.servers.get(s).get_info()})
         return d
