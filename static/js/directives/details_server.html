@@ -13,15 +13,15 @@
         <h5><strong>Load 1 min:</strong></h5>
         <h5><strong>Load 5 min:</strong></h5>
         <h5><strong>Load 15 min:</strong></h5>
+<!-- 'uptime': u'1:20', u'MemTotal': '15.56 GB', 'lsb_release': u'Ubuntu 16.04.1 LTS', u'SwapTotal': '15.88 GB', 'iowait': u'0.00', u'SwapFree': '15.88 GB', 'cpu': '7', u'MemAvailable': '12.19 GB', u'MemFree': '11.0 GB', 'avg5': u'0,37', 'avg15': u'0,37', 'avg1': u'0,39'         -->
     </div>
     <div class="col-xs-3">
-        <h5>[[server.lsb_release]]</h5>
-        <h5>[[server.uptime]]</h5>
-        <h5>[[server.cpu]]</h5>
-        <h5>[[server.avg1]]</h5>
-        <h5>[[server.avg5]]</h5>
-        <h5>[[server.avg15]]</h5>
-        
+        <h5 id="lsb_release">NA</h5>
+        <h5 id="uptime">NA</h5>
+        <h5 id="cpu">NA</h5>
+        <h5 id="avg1">NA</h5>
+        <h5 id="avg5">NA</h5>
+        <h5 id="avg15">NA</h5>
         
     </div>
     <div class="col-xs-2 col-xs-offset-1">
@@ -33,158 +33,64 @@
         <h5><strong>iowait:</strong></h5> 
     </div>
     <div class="col-xs-3">
-        <h5>[[server.MemTotal]]</h5>
-        <h5>[[server.MemAvailable]]</h5>
-        <h5>[[server.MemFree]]</h5>
-        <h5>[[server.SwapTotal]]</h5>
-        <h5>[[server.SwapFree]]</h5>
-        <h5>[[server.iowait]]</h5>
+        <h5 id="MemTotal">NA</h5>
+        <h5 id="MemAvailable">NA</h5>
+        <h5 id="MemFree">NA</h5>
+        <h5 id="SwapTotal">NA</h5>
+        <h5 id="SwapFree">NA</h5>
+        <h5 id="iowait">NA</h5>
     </div>    
 </div>
 
 <div class="row mt25">
 	<div class="row">
 	    <div class="col-xs-10 col-xs-offset-1 mt25 bg_green center">
-	        <h3 class="m0">ZFS Pools</h3>
-	        <h5>Last update:[[server.zpoolupdate]]</h5>
+	        <h3 class="m0">Containers</h3>
 	    </div>
 	</div>
-
     <div class="col-xs-10 col-xs-offset-1 mt25 bg_green center">
         <div class="col-xs-2">
             <h4 class="m0"><strong>Name</strong></h4>
         </div>
         <div class="col-xs-2">
-            <h4 class="m0"><strong>Size</strong></h4>
-        </div>
-        <div class="col-xs-2">
-            <h4 class="m0"><strong>Use</strong></h4>
-        </div>
-        <div class="col-xs-2">
-            <h4 class="m0"><strong>Fragmented</strong></h4>
-        </div>
-        <div class="col-xs-2">
-            <h4 class="m0"><strong>Health</strong></h4>
-        </div>
-        
-    </div>
-<!-- 	<div id="data-table"></div> -->
-	<div class="col-xs-10 col-xs-offset-1 center" ng-repeat="d in server.zpool" style="border-bottom:1px solid black;"> 
-        <div class="col-xs-2">
-            <h5>[[d.NAME]]</h5>
-        </div>
-        <div class="col-xs-2">
-            <h5>[[d.SIZE]]</h5>
-        </div>
-        <div class="col-xs-2">
-            <h5>[[d.ALLOC]]</h5>
-        </div>
-        <div class="col-xs-2">
-            <h5>[[d.FRAG]]</h5>
-        </div>
-        <div class="col-xs-2">
-            <h5>[[d.HEALTH]]</h5>
-        </div>
-	
-	</div>
-
-
-</div>
-
-
-
-<div class="row mt25">
-	<div class="row">
-	    <div class="col-xs-10 col-xs-offset-1 mt25 bg_green center">
-	        <h3 class="m0">Disks</h3>
-	    </div>
-	</div>
-
-    <div class="col-xs-10 col-xs-offset-1 mt25 bg_green center">
-        <div class="col-xs-2">
-            <h4 class="m0"><strong>Mounted on</strong></h4>
-        </div>
-        <div class="col-xs-2">
-            <h4 class="m0"><strong>Size</strong></h4>
-        </div>
-        <div class="col-xs-2">
-            <h4 class="m0"><strong>Use%</strong></h4>
-        </div>
-        
-    </div>
-<!-- 	<div id="data-table"></div> -->
-	<div class="col-xs-10 col-xs-offset-1 center" ng-repeat="d in server.disks" style="border-bottom:1px solid black;"> 
-        <div class="col-xs-2">
-            <h5>[[d.MountedOn]]</h5>
-        </div>
-        <div class="col-xs-2">
-            <h5>[[d.Size]]</h5>
+            <h4 class="m0"><strong>Status</strong></h4>
         </div>
         <div class="col-xs-8">
-        	<h5>
-			<div class="progress">
-			  <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="40"
-			  aria-valuemin="0" aria-valuemax="100" style="width:[[d.Use]]">
-			    [[d.Use]]
-			  </div>
-			</div>
-			</h5>
+            <h4 class="m0"><strong>Controls</strong></h4>
         </div>
-	
-	</div>
-
-
+    </div>
+    <div class="col-xs-10 col-xs-offset-1 center" ng-repeat="c in containers | orderBy:'status'" style="border-bottom:1px solid black;">
+        <div class="col-xs-2">
+            <h5>[[c.name]]</h5>
+        </div>
+        <div class="col-xs-2">
+            <h5>[[c.status]]</h5>
+        </div>
+        <div class="col-xs-8">
+            <button class="col-xs-3" ng-click="runContainerMethod(server, c, 'start')">
+                <h5>
+                    <span class="glyphicon glyphicon-play" aria-hidden="true"></span>
+                    <strong>start</strong>
+                </h5>
+            </button>
+            <button class="col-xs-3" ng-click="runContainerMethod(server, c, 'stop')">
+                <h5>
+                    <span class="glyphicon glyphicon-stop" aria-hidden="true"></span>
+                   <strong> stop</strong>
+                </h5>
+            </button>
+            <button class="col-xs-3" ng-click="runContainerMethod(server, c, 'freeze')">
+                <h5>
+                    <span class="glyphicon glyphicon-asterisk" aria-hidden="true"></span>
+                    <strong>freeze</strong>
+                </h5>
+            </button>
+            <button class="col-xs-3" ng-click="runContainerMethod(server, c, 'unfreeze')">
+                <h5>
+                    <span class="glyphicon glyphicon-tint" aria-hidden="true"></span>
+                    <strong>unfreeze</strong>
+                </h5>
+            </button>
+        </div>
+    </div>
 </div>
-
-<!-- <div class="row mt25"> -->
-<!-- 	<div class="row"> -->
-<!-- 	    <div class="col-xs-10 col-xs-offset-1 mt25 bg_green center"> -->
-<!-- 	        <h3 class="m0">Containers</h3> -->
-<!-- 	    </div> -->
-<!-- 	</div> -->
-<!--     <div class="col-xs-10 col-xs-offset-1 mt25 bg_green center"> -->
-<!--         <div class="col-xs-2"> -->
-<!--             <h4 class="m0"><strong>Name</strong></h4> -->
-<!--         </div> -->
-<!--         <div class="col-xs-2"> -->
-<!--             <h4 class="m0"><strong>Status</strong></h4> -->
-<!--         </div> -->
-<!--         <div class="col-xs-8"> -->
-<!--             <h4 class="m0"><strong>Controls</strong></h4> -->
-<!--         </div> -->
-<!--     </div> -->
-<!--     <div class="col-xs-10 col-xs-offset-1 center" ng-repeat="c in containers | orderBy:'status'" style="border-bottom:1px solid black;"> -->
-<!--         <div class="col-xs-2"> -->
-<!--             <h5>[[c.name]]</h5> -->
-<!--         </div> -->
-<!--         <div class="col-xs-2"> -->
-<!--             <h5>[[c.status]]</h5> -->
-<!--         </div> -->
-<!--         <div class="col-xs-8"> -->
-<!--             <button class="col-xs-3" ng-click="runContainerMethod(server, c, 'start')"> -->
-<!--                 <h5> -->
-<!--                     <span class="glyphicon glyphicon-play" aria-hidden="true"></span> -->
-<!--                     <strong>start</strong> -->
-<!--                 </h5> -->
-<!--             </button> -->
-<!--             <button class="col-xs-3" ng-click="runContainerMethod(server, c, 'stop')"> -->
-<!--                 <h5> -->
-<!--                     <span class="glyphicon glyphicon-stop" aria-hidden="true"></span> -->
-<!--                    <strong> stop</strong> -->
-<!--                 </h5> -->
-<!--             </button> -->
-<!--             <button class="col-xs-3" ng-click="runContainerMethod(server, c, 'freeze')"> -->
-<!--                 <h5> -->
-<!--                     <span class="glyphicon glyphicon-asterisk" aria-hidden="true"></span> -->
-<!--                     <strong>freeze</strong> -->
-<!--                 </h5> -->
-<!--             </button> -->
-<!--             <button class="col-xs-3" ng-click="runContainerMethod(server, c, 'unfreeze')"> -->
-<!--                 <h5> -->
-<!--                     <span class="glyphicon glyphicon-tint" aria-hidden="true"></span> -->
-<!--                     <strong>unfreeze</strong> -->
-<!--                 </h5> -->
-<!--             </button> -->
-<!--         </div> -->
-<!--     </div> -->
-<!-- </div> -->
