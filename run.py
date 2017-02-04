@@ -170,9 +170,4 @@ def config_app():
 
 if __name__ == "__main__":
     config_app()
-<<<<<<< 255b2899ccc6cceadd1a55ff7db0271028534098
     socketio.run(app, host='0.0.0.0')
-=======
-    #socketio.run(app, use_reloader=False)
-    socketio.run(app)
->>>>>>> Live update server statistics and cleanup of code.
