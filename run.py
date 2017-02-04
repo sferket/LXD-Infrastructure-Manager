@@ -10,6 +10,7 @@ from application.api import LxdApi
 from application.api import SshApi
 from application.api.servers import Servers
 #from flask_socketio import SocketIO
+
 from config import Config
 import time
 import random
@@ -28,40 +29,30 @@ servers = None
 
 @app.route("/")
 def main():
-#     containers = {}
-#     for s in config:
-#         containers[s] = lxd_api.get_container_info(s)
-# 
-#     #ssh = SshApi(config)
-#     #server_info = {}
-#     #for s in config:
-#     #    server_info[s] = ssh.get_server_info(s)
-# 
-#     print '[[['
-#     print config
-#     print containers
-#     print ']]]'
-#     vals = {
-# #        "servers": config,
-# #        "containers": containers,
-# #        "server_info": server_info,
-#     }
-#    return render_template("index.html", **vals)
     return render_template("index.html")
 
 @app.route("/get_info/")
 def get_info_r():
     containers = {}
-    for s in config:
-        containers[s] = lxd_api.get_container_info(s)
 
-    print containers
+    containers = servers.get_containers()
+    
     vals = {
         "servers": servers.get_display_info(),
         "containers": containers,
-#        "server_info": server_info,
     }
+    return jsonify(vals)
+
+@app.route("/default_name/")
+def get_default_name_r():
+    containers = {}
+
+    containers = servers.get_containers()
     
+    vals = {
+        "servers": servers.get_display_info(),
+        "containers": containers,
+    }
     return jsonify(vals)
 
 @app.route("/container_cmd/", methods=["POST"])
@@ -74,37 +65,26 @@ def container_cmd_handler():
         snap = req_data.get("snap")
         tar_name = '' or req_data.get("tar_name")
         if req_data.get("type") == "container":
+            if method == 'refresh':
+                servers.get(server).refresh_container_info() #.refresh_container_info()
             lxd_api.exec_container_cmd(server, container, method, tar_name)
-            # get update container info after method
-            c_info = get_container_info(server, container)
-            return make_response(jsonify(c_info))
         elif req_data.get("type") == "snapshot":
             lxd_api.exec_snapshot_cmd(server, snap, container, method)
-            c_info = get_container_info(server, container)
-            return make_response(jsonify(c_info))
 
-def get_container_info(server, container):
-    field_translations = {
-        "name": "name",
-
-    }
-    for c in lxd_api.get_container_info(server):
-        if c["name"] == container:
-            return c
 
 def update_thread():
 #    global servers
     """Example of how to send server generated events to clients."""
-    count = 0
     while True:
-        socketio.sleep(5)
-        count += 1
+        if servers.get_client_update().wait(60):
+            servers.get_client_update().clear()
+
         mes = {}
         if servers:
             for s in servers.get():
                 mes.update({s : servers.get(s).get_info()})
             mes = json.dumps(mes)
-            
+             
             socketio.emit('my_response',
                            mes,
                           namespace='/update')
@@ -159,14 +139,6 @@ def config_app():
 # New
     global servers
     servers = Servers(config)
-    print '===========>%s' % servers.get()
-    for s in servers.get():
-        print s
-        print servers.get().get(s).get_info()
-        
-
-    #servers.execute_ssh_command()
-
 
 if __name__ == "__main__":
     config_app()
