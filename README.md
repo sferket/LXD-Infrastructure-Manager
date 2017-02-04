@@ -8,6 +8,17 @@ We wanted to be able to:
 # Preview
 ![Alt text](/screenshots/screenshot1.png?raw=true "Overview")
 
+# Status
+This software should be considered experimental and a preview version. 
+It lacks authentication and authorization (we have an Apache proxy in front of it that handles authentication). 
+
+For version 1.0 we plan:
+- Configurable listen address (default localhost)
+- Replace current ssh for getting server status by Saltstack
+- We might also replace LXD API with Saltstack
+- Container creation from GUI
+- Plugin architecture for custom container commands  
+
 # Installation
 ## Prepare LXD server(s)
 We tested on Ubuntu 16.04
