@@ -55,7 +55,6 @@ def get_info_r():
     for s in config:
         containers[s] = lxd_api.get_container_info(s)
 
-    print containers
     vals = {
         "servers": servers.get_display_info(),
         "containers": containers,
@@ -159,12 +158,6 @@ def config_app():
 # New
     global servers
     servers = Servers(config)
-    print '===========>%s' % servers.get()
-    for s in servers.get():
-        print s
-        print servers.get().get(s).get_info()
-        
-
     #servers.execute_ssh_command()
 
 
