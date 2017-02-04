@@ -1,5 +1,6 @@
 app.controller("MainController", ["$scope", "$http", "$compile", 
 function($scope, $http, $compile) {
+	
     $scope.servers = null,
     $scope.server = null,
     $scope.server_info = null,
@@ -25,7 +26,7 @@ function($scope, $http, $compile) {
             }
         ),
     $scope.updateData = function() {
-        console.log("updating")
+        console.log("updating updateData")
         $http({
             method: "GET",
             url: "/get_info"
@@ -33,6 +34,7 @@ function($scope, $http, $compile) {
         .then(
             function Success(response) {
                 $scope.servers = response.data.servers;
+                //$scope.servers = '';
                 $scope.server_info = response.data.server_info;
                 $scope.containers = response.data.containers;
                 console.log("response: ", response);
@@ -50,6 +52,8 @@ function($scope, $http, $compile) {
         return $scope.containers[servername];
     },
     $scope.getServerByName = function(name) {
+    	console.log('=>')
+    	console.log($scope.servers[name])
         return $scope.servers[name];
     },
 //    $scope.getServerInfoByName = function(name) {
@@ -65,6 +69,7 @@ function($scope, $http, $compile) {
     },
     // Load detail directives on menu item click 
     $scope.openDetailsContainer = function(server, container) {
+    	console.log('$scope.openDetailsContainer')
         var compiledHtml = $compile(String(
             '<details_container container="getContainerByName(\'-s1-\',\'-c1-\')"' +
             'server="getServerByName(\'-s2-\')" ' +
@@ -92,4 +97,38 @@ function($scope, $http, $compile) {
 //        console.log($scope.getServerInfoByName(server.servername));
         $("#details_container").html(compiledHtml);
     };
+    
+    // Socket experiment
+    namespace = "/update";
+    var socket = io.connect(
+        "http://" 
+        + document.domain 
+        + ":" 
+        + location.port 
+        + namespace
+    );
+
+    socket.on("connect", function(msg) {
+    	console.log("socket.on2");
+        socket.emit(
+            "connected", 
+            {data: "Im connected!",}
+        );
+    });
+
+    socket.on('disconnect', function(){
+        console.log('user disconnected');
+    });    
+    
+    socket.on('my_response', function(msg) {
+    	console.log('response2');
+    	$scope.updateData()
+    });
+
+    socket.on('destroy', function () {
+    	console.log("Destroy");
+        socket.removeListener('my_response');
+    });    
+ // Socket experiment
 }]);
+

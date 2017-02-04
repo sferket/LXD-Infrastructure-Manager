@@ -1,3 +1,10 @@
 <div class="col-xs-12">
-    <h5 class="link_cursor">[[container.name]]</h5>
+    <h5 class="link_cursor">
+    	<div ng-switch="container.status">
+  			<div ng-switch-when="Running"><span class="glyphicon glyphicon-play"> [[container.name]]</span></div>
+  			<div ng-switch-when="Stopped"><span class="glyphicon glyphicon-stop"> [[container.name]]</span></div>
+  			<div ng-switch-when="Frozen"><span class="glyphicon glyphicon-pause"> [[container.name]]</span></div>
+  			<div ng-switch-default><span class="glyphicon glyphicon-question-sign"> [[container.name]]</span></div>
+		</div>
+    </h5>
 </div>

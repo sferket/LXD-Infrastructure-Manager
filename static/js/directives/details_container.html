@@ -7,11 +7,14 @@
             <div class="modal-body">
                 <div class="input-group">
                     <span class="input-group-addon" id="snap-input-desc">Snapshot name:</span>
-                    <input type="text" class="form-control" placeholder="Name" aria-describedby="snap-input-desc" id="tar_name" />
+                    <input type="text" class="form-control" placeholder="Name" aria-describedby="snap-input-desc" id="tar_name"/>
+<!-- 					<script> -->
+<!--  						document.getElementById('snapname').value = new Date().toISOString(); -->
+<!-- 					</script>  -->
                 </div>
             </div>
             <div class="modal-footer">
-                <button class="col-xs-3 col-xs-offset-6" 
+                <button class="col-xs-3 col-xs-offset-6" data-dismiss="modal"
                 ng-click="runContainerMethod(server.servername, container.name, 'create_snapshot', 'container', '')">
                     <h5>Create</h5>
                 </button>
@@ -30,14 +33,23 @@
         </div>
     </div>
     <div class="col-xs-12 mt25">
-        <button class="col-xs-3 col-xs-offset-6" type="button" data-toggle="modal" data-target="#createsnap-modal">
+<!--     	<div class="col-xs-3"> -->
+<!--     		<span class="glyphicon glyphicon-refresh" onclick="myfunction();"> -->
+<!--     		<button class="glyphicon glyphicon-refresh" onclick="runContainerMethod(server.servername, container.name, 'refresh', 'container', '')"></button>	 -->
+<!--     	</div> -->
+        <button class="col-xs-1" ng-click="runContainerMethod(server.servername, container.name, 'refresh', 'container', '')">
+            <h5>
+                <span class="glyphicon glyphicon-refresh" aria-hidden="true"></span>
+            </h5>
+        </button>
+        <button class="col-xs-3 col-xs-offset-5" type="button" data-toggle="modal" data-target="#createsnap-modal" ng-click="update_tar_cont(container.name)">
             <h5>
                 <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
                 <strong>Create snapshot</strong>
             </h5>
         </button>
-        <button class="col-xs-3"
-        ng-click="runContainerMethod(server.servername, container.name, 'delete', 'container', '')">
+
+        <button class="col-xs-3" ng-click="runContainerMethod(server.servername, container.name, 'delete', 'container', '')">
             <h5>
                 <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
                 <strong>Delete container</strong>
@@ -52,6 +64,7 @@
         <h5><strong>Mac:</strong></h5> 
         <h5><strong>Inet:</strong></h5>
         <h5><strong>Memory usage:</strong></h5>
+        <h5><strong>Peak usage:</strong></h5>
         <h5><strong>Swap usage:</strong></h5>
     </div>
     <div class="col-xs-3">
@@ -60,19 +73,26 @@
         <h5>[[container.mac]]</h5>
         <h5>[[container.inet]]</h5>
         <h5>[[container.memory.usage]]</h5>
+        <h5>[[container.memory.usage_peak]]</h5>
         <h5>[[container.memory.swap_usage]]</h5>
+        
     </div>
     <div class="col-xs-2 col-xs-offset-1">
         <h5><strong>Architecture:</strong></h5> 
         <h5><strong>Profiles:</strong></h5>
-        <h5><strong>Create date:</strong></h5> 
+        <h5><strong>Create date:</strong></h5>
+        <h5><strong>CPU Usage:</strong></h5> 
     </div>
     <div class="col-xs-3">
         <h5>[[container.architecture]]</h5>
         <h5>[[container.profiles]]</h5>
         <h5>[[container.created_at]]</h5>
+        <h5>[[container.cpu]]</h5>
     </div>
+    
+    
 </div>
+
 <div class="row mt50">
     <div class="col-xs-12 bg_green center">
         <div class="col-xs-12">
