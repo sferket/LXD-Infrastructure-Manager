@@ -12,7 +12,7 @@ class lxd_socketio(SocketIO):
 
     def __init__(self, app=None, **kwargs):
         super(lxd_socketio, self).__init__(app=None, **kwargs)
-        self.lxd_thread = None
+        #self.lxd_thread = None
         self.server_data = {"server_cpu_usage": {}}
         self.config = None
         self.label_ticker = 1

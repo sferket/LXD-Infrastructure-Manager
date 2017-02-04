@@ -1,6 +1,7 @@
 <div class="row">
     <div class="col-xs-12 center bg_green">
         <h1 class="m0">[[server.servername]]</h1>
+        <input type="hidden" name="server-name" id="server-name" value="[[server.servername]]">
     </div>
 </div>
 
@@ -12,14 +13,16 @@
         <h5><strong>Load 1 min:</strong></h5>
         <h5><strong>Load 5 min:</strong></h5>
         <h5><strong>Load 15 min:</strong></h5>
+<!-- 'uptime': u'1:20', u'MemTotal': '15.56 GB', 'lsb_release': u'Ubuntu 16.04.1 LTS', u'SwapTotal': '15.88 GB', 'iowait': u'0.00', u'SwapFree': '15.88 GB', 'cpu': '7', u'MemAvailable': '12.19 GB', u'MemFree': '11.0 GB', 'avg5': u'0,37', 'avg15': u'0,37', 'avg1': u'0,39'         -->
     </div>
     <div class="col-xs-3">
-        <h5>[[server_info.lsb_release]]</h5>
-        <h5>[[server_info.uptime]]</h5>
-        <h5>[[server_info.cpu]]</h5>
-        <h5>[[server_info.avg1]]</h5>
-        <h5>[[server_info.avg5]]</h5>
-        <h5>[[server_info.avg15]]</h5>
+        <h5 id="lsb_release">NA</h5>
+        <h5 id="uptime">NA</h5>
+        <h5 id="cpu">NA</h5>
+        <h5 id="avg1">NA</h5>
+        <h5 id="avg5">NA</h5>
+        <h5 id="avg15">NA</h5>
+        
     </div>
     <div class="col-xs-2 col-xs-offset-1">
         <h5><strong>MemTotal:</strong></h5> 
@@ -27,13 +30,15 @@
         <h5><strong>MemFree:</strong></h5> 
         <h5><strong>SwapTotal:</strong></h5> 
         <h5><strong>SwapFree:</strong></h5> 
+        <h5><strong>iowait:</strong></h5> 
     </div>
     <div class="col-xs-3">
-        <h5>[[server_info.MemTotal]]</h5>
-        <h5>[[server_info.MemAvailable]]</h5>
-        <h5>[[server_info.MemFree]]</h5>
-        <h5>[[server_info.SwapTotal]]</h5>
-        <h5>[[server_info.SwapFree]]</h5>
+        <h5 id="MemTotal">NA</h5>
+        <h5 id="MemAvailable">NA</h5>
+        <h5 id="MemFree">NA</h5>
+        <h5 id="SwapTotal">NA</h5>
+        <h5 id="SwapFree">NA</h5>
+        <h5 id="iowait">NA</h5>
     </div>    
 </div>
 
