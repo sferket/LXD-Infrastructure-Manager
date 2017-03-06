@@ -4,6 +4,7 @@ app.directive("detailsServer", ["$http", function($http) {
         scope: {
             server: "=server",
             containers: "=containers",
+            sections: "=sections",
 //            server_info: "=serverinfo",	
         },
         templateUrl: "/static/js/directives/details_server.html",

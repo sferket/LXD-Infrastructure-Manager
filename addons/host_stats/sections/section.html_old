@@ -1,0 +1,36 @@
+<div class="row mt25">
+    <div class="col-xs-2 col-xs-offset-1">
+        <h5><strong>OS2222:</strong></h5> 
+        <h5><strong>Uptime:</strong></h5> 
+        <h5><strong>CPU Usage(%):</strong></h5> 
+        <h5><strong>Load 1 min:</strong></h5>
+        <h5><strong>Load 5 min:</strong></h5>
+        <h5><strong>Load 15 min:</strong></h5>
+    </div>
+    <div class="col-xs-3">
+        <h5>[[server.lsb_release]]</h5>
+        <h5>[[server.uptime]]</h5>
+        <h5>[[server.cpu]]</h5>
+        <h5>[[server.avg1]]</h5>
+        <h5>[[server.avg5]]</h5>
+        <h5>[[server.avg15]]</h5>
+        
+        
+    </div>
+    <div class="col-xs-2 col-xs-offset-1">
+        <h5><strong>MemTotal:</strong></h5> 
+        <h5><strong>MemAvailable:</strong></h5>
+        <h5><strong>MemFree:</strong></h5> 
+        <h5><strong>SwapTotal:</strong></h5> 
+        <h5><strong>SwapFree:</strong></h5> 
+        <h5><strong>iowait:</strong></h5> 
+    </div>
+    <div class="col-xs-3">
+        <h5>[[server.MemTotal]]</h5>
+        <h5>[[server.MemAvailable]]</h5>
+        <h5>[[server.MemFree]]</h5>
+        <h5>[[server.SwapTotal]]</h5>
+        <h5>[[server.SwapFree]]</h5>
+        <h5>[[server.iowait]]</h5>
+    </div>    
+</div>

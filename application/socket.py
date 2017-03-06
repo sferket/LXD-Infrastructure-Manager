@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-import eventlet
-eventlet.monkey_patch()
+#import eventlet
+#eventlet.monkey_patch()
 from flask_socketio import SocketIO
 #from flask_socketio import emit
 #from flask_socketio import join_room

@@ -16,6 +16,8 @@ function($scope, $http, $compile) {
                 $scope.servers = response.data.servers;
                 $scope.server_info = response.data.server_info;
                 $scope.containers = response.data.containers;
+                //$scope.sections = response.data.sections;
+                
                 console.log("response: ", response);
                 console.log("servers: ", $scope.servers);
                 console.log("server_info: ", $scope.server_info);
@@ -37,10 +39,13 @@ function($scope, $http, $compile) {
                 //$scope.servers = '';
                 $scope.server_info = response.data.server_info;
                 $scope.containers = response.data.containers;
+                $scope.sections = response.data.sections;
+                
                 console.log("response: ", response);
                 console.log("servers: ", $scope.servers);
                 console.log("server_info: ", $scope.server_info);
                 console.log("containers: ", $scope.containers);
+                console.log("sections: ", $scope.sections);
             },
             function Error(response) {
                 console.log("Error getting data");

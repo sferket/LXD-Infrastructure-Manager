@@ -11,18 +11,34 @@ from application.api import SshApi
 from application.api.servers import Servers
 #from flask_socketio import SocketIO
 from config import Config
-import time
+ 
 import random
 import pdb
 import json
 
+import time
+print '444' 
 
+from lxd_infrastructure_manager.hosts import Hosts
+from lxd_infrastructure_manager.addons import Load
+
+#hosts = Hosts()
+
+#time.sleep(20)
+
+print '-1.1'
 app = Flask(__name__)
+print '-1.2'
 app.debug = True #TODO REMOVE FOR LIVE
-app.config["SECRET_KEY"] = "secret!" #TODO ACTUAL SECRET KEY
+print '-1.3'
+app.config["SECRET_KEY"] = "UBeCeTW3TE5c24XecqLWGoRCBhdDKR" #TODO ACTUAL SECRET KEY
+print '-1.3'
 socketio = lxd_socketio()
+print '-1.4'
 lxd_api = LxdApi()
+print '-1.5'
 global config
+print '-1.6'
 thread = None
 servers = None
 
@@ -52,12 +68,18 @@ def main():
 @app.route("/get_info/")
 def get_info_r():
     containers = {}
-    for s in config:
-        containers[s] = lxd_api.get_container_info(s)
+    #for s in config:
+    #    containers[s] = lxd_api.get_container_info(s)
+    print '00000000000000'
+    
+#    print servers.get_display_info()
+#    print servers.sections
 
     vals = {
         "servers": servers.get_display_info(),
+        #"servers": servers.get(),
         "containers": containers,
+#        "sections": servers.sections,
 #        "server_info": server_info,
     }
     
@@ -147,20 +169,33 @@ def _get_configuration():
     return config
 
 def config_app():
+    print '1'
     import requests
     from requests.packages.urllib3.exceptions import InsecureRequestWarning
     requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
+    print '2'
     global config
-    config = _get_configuration()
+    #config = _get_configuration()
     socketio.init_app(app)
-    socketio.set_lxd_config(config)
-    lxd_api.set_config(config)
+    print '3'
+    #socketio.set_lxd_config(config)
+    #lxd_api.set_config(config)
 # New
     global servers
-    servers = Servers(config)
+    #servers = Servers(config)
+    print '4'
+    load = Load('/home/ferkets/git/LXD-Infrastructure-Manager/addons')
+    load.inject_hosts_update_methods(Hosts)
+    servers = Hosts()
+    #servers.update_host_stats()
+    servers.do_updates()
+    print '5'
     #servers.execute_ssh_command()
 
 
 if __name__ == "__main__":
+    print '0.1'
     config_app()
+    print '0.2'
     socketio.run(app, host='0.0.0.0')
+    print '0.3'

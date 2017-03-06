@@ -1,1 +1,2 @@
-import models
+import addons
+import hosts

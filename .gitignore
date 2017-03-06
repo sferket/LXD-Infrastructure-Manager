@@ -4,3 +4,5 @@
 *.pyx
 *.swp
 *.pyc
+paramiko_log.log
+test.py
