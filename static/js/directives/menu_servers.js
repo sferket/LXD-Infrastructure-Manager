@@ -7,7 +7,7 @@ app.directive("menuServers", function() {
             serverClick: "&",
             myStyle: "=myStyle",
         },
-        templateUrl: "/static/js/directives/menu_servers.html",
+        templateUrl: "/renderedstatic/host/menu_servers.html",
         controller: function($scope) {
             this.addItem = function(val) {
                 console.log(val);

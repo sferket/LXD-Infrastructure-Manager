@@ -8,12 +8,9 @@ import inspect
 
 def _concat_files(dir):
     ret = ''
-    print '+Check:%s' % dir
     if os.path.isdir(dir):
-        print '+isdir'
         for d in glob('%s/*.html'%dir):
             ret +=  open(d, 'r').read()
-            print '+%s' % ret
     return ret
 
 
@@ -37,8 +34,8 @@ class Load():
     addons = {}
     #hosts = None
     host_functions = {}
-    host_modals = {}
-    host_buttons = {}
+    host_modals = ''
+    host_buttons = ''
     host_sections = ''
     
     def _get_addons_from_directory(self, dir):
@@ -64,13 +61,12 @@ class Load():
 
         for mod, manifest in self.addons.iteritems():
             tst = importlib.import_module(mod)
-            self.host_modals.update({mod:_concat_files(os.path.join(manifest.get('path') ,'modals'))})
-            self.host_buttons.update({mod:_concat_files(os.path.join(manifest.get('path') ,'buttons'))})
-            #self.host_sections.update({mod:_concat_files(os.path.join(manifest.get('path') ,'sections'))})
+            self.host_modals += _concat_files(os.path.join(manifest.get('path') ,'modals'))
+            self.host_buttons += _concat_files(os.path.join(manifest.get('path') ,'buttons'))
             self.host_sections += _concat_files(os.path.join(manifest.get('path') ,'sections'))
             
             
-        print self.host_modals
+        #print self.host_modals
         #modals = []
         for sc in Host.__subclasses__():
             inst = sc()

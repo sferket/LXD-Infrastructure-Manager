@@ -7,7 +7,8 @@ app.directive("detailsServer", ["$http", function($http) {
             sections: "=sections",
 //            server_info: "=serverinfo",	
         },
-        templateUrl: "/static/js/directives/details_server.html",
+        templateUrl: "/renderedstatic/host/details_server.html",
+        
         
         link: function($scope, elem, attr) {
             $scope.runContainerMethod = function(server, container, method) {

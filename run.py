@@ -5,6 +5,7 @@ from flask import session
 from flask import request
 from flask import Response
 from flask import make_response
+from flask import Markup
 from application.socket import lxd_socketio
 from application.api import LxdApi
 from application.api import SshApi
@@ -44,37 +45,48 @@ servers = None
 
 @app.route("/")
 def main():
-#     containers = {}
-#     for s in config:
-#         containers[s] = lxd_api.get_container_info(s)
-# 
-#     #ssh = SshApi(config)
-#     #server_info = {}
-#     #for s in config:
-#     #    server_info[s] = ssh.get_server_info(s)
-# 
-#     print '[[['
-#     print config
-#     print containers
-#     print ']]]'
-#     vals = {
-# #        "servers": config,
-# #        "containers": containers,
-# #        "server_info": server_info,
-#     }
-#    return render_template("index.html", **vals)
     return render_template("index.html")
+
+@app.route('/flaskstatic/<path:path>')
+def serve_partial(path):
+    print '+++++++++++++++++Staitc'
+    tst = '<div class="row bg_green">\
+    <div class="col-md-12 center">\
+        <h1 style="color:white;">LXD Control Panel [[controller]]</h1>\
+    </div>\
+    </div>'
+    from flask import Markup
+
+    #return render_template('/partial/{}'.format(path))
+    tst = '<h1 style="color:white;">LXD Control Panel</h1>'
+    #tst = 'test123'
+    return render_template('directives/menu_servers_tmp.html', tst=Markup(tst))
+
+@app.route('/renderedstatic/<type>/<file>')
+def serve_static(type, file):
+#     tst = '<div class="row bg_green">\
+#     <div class="col-md-12 center">\
+#         <h1 style="color:white;">LXD Control Panel [[controller]]</h1>\
+#     </div>\
+#     </div>'
+    
+
+    #return render_template('/partial/{}'.format(path))
+    #tst = '<h1 style="color:white;">LXD Control Panel</h1>'
+    #tst = 'test123'
+    #return render_template('directives/%s' % file, tst=Markup(tst))
+    return render_template('directives/%s' % file, sections=Markup(load.host_sections), buttons=Markup(load.host_buttons) )
+
+
 
 @app.route("/get_info/")
 def get_info_r():
     containers = {}
-    #for s in config:
-    #    containers[s] = lxd_api.get_container_info(s)
-    print '00000000000000'
     
-#    print servers.get_display_info()
-#    print servers.sections
+#    for k,v in servers.get_display_info().iteritems():
+#        print 'get_info(%s): %s' % (k,v) 
 
+    print '8888$>%s' % servers.get_display_info()
     vals = {
         "servers": servers.get_display_info(),
         #"servers": servers.get(),
@@ -184,10 +196,12 @@ def config_app():
     global servers
     #servers = Servers(config)
     print '4'
+    global load
     load = Load('/home/ferkets/git/LXD-Infrastructure-Manager/addons')
     load.inject_hosts_update_methods(Hosts)
     servers = Hosts()
     #servers.update_host_stats()
+    
     servers.do_updates()
     print '5'
     #servers.execute_ssh_command()
