@@ -147,17 +147,25 @@ def _get_configuration():
     return config
 
 def config_app():
+    print "1"
     import requests
     from requests.packages.urllib3.exceptions import InsecureRequestWarning
+    print "2"
     requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
+    print "3"
     global config
     config = _get_configuration()
+    print "4"
     socketio.init_app(app)
+    print "5"
     socketio.set_lxd_config(config)
+    print "6"
     lxd_api.set_config(config)
 # New
     global servers
+    print "7"
     servers = Servers(config)
+    print "8"
     #servers.execute_ssh_command()
 
 

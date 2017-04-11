@@ -61,28 +61,29 @@ class _WebsocketClient(WebSocketBaseClient):
         self._th.start()
 
     def received_message(self, message):
-        mes = json.loads(message.data.decode('utf-8'))
-        #print mes
-        timestamp = mes.get("timestamp")
-        type = mes.get("type")
-        type = mes.get("type")
-        level = ""
-        method = ""
-        url = ""
-        message = ""
-        
-        metadata = mes.get("metadata", {}) 
-        if metadata.has_key("context"):
-            method = metadata.get("context").get("method", "")
-            url = metadata.get("context").get("url", "")
-            
-        if metadata.has_key("level"):
-            level = metadata.get("level", "")
-        if metadata.has_key("message"):
-            message = metadata.get("message", "")
-
-        if type == 'operation' and metadata.get('class') == 'task' and metadata.get('status') == 'Success':              
-            self.server.refresh_container_info()
+        False
+#         mes = json.loads(message.data.decode('utf-8'))
+#         #print mes
+#         timestamp = mes.get("timestamp")
+#         type = mes.get("type")
+#         type = mes.get("type")
+#         level = ""
+#         method = ""
+#         url = ""
+#         message = ""
+#         
+#         metadata = mes.get("metadata", {}) 
+#         if metadata.has_key("context"):
+#             method = metadata.get("context").get("method", "")
+#             url = metadata.get("context").get("url", "")
+#             
+#         if metadata.has_key("level"):
+#             level = metadata.get("level", "")
+#         if metadata.has_key("message"):
+#             message = metadata.get("message", "")
+# 
+#         if type == 'operation' and metadata.get('class') == 'task' and metadata.get('status') == 'Success':              
+#             self.server.refresh_container_info()
 
 class ContainerInfo(object):
 
@@ -127,28 +128,42 @@ class Server(threading.Thread):
 
     def __init__(self, name, config, clientupdaterequest):
         #tmp = "Yestt htis is it"
+        print "2.1"
         self.name = name
         self.config = config
+        print "2.2"
         self.clientupdaterequest = clientupdaterequest
+        print "2.3"
         self.session = self._open_ssh()
+        print "2.4"
         cert = (self.config.get("certfile"), self.config.get("keyfile"))
+        print "2.5"
         ssl_options = {"keyfile": self.config.get("keyfile"),"certfile": self.config.get("certfile")}
+        print "2.6"
         self.ws_client = client.Client(
             endpoint=self.config.get("endpoint"),
             cert=cert,
             verify=False
         )
+        print "2.7"
         
         
         self.ev_client = self.ws_client.events(_WebsocketClient)
+        print "2.8"
         #self.ev_client.setUpdateReq(clientupdaterequest)
         self.ev_client.setServer(self)
+        print "2.9"
         self.ev_client.ssl_options=ssl_options
+        print "2.10"
         self.ev_client.connect()
+        print "2.11"
         self.refresh()
+        print "2.12"
         self.refresh_container_info()
+        print "2.13"
 
         threading.Thread.__init__(self)
+        print "2.14"
 
     def run(self):
         while True:
@@ -297,7 +312,7 @@ class Server(threading.Thread):
         
         self.info = cdata
         
-        self.refresh_container_stats()
+        #self.refresh_container_stats()
         self.clientupdaterequest.set()
             
     def get_info(self, attr=None, val_if_null=None):
@@ -339,11 +354,15 @@ class Server(threading.Thread):
                 self.containers_cpudata.update( {cont.get('name') : cpu_dat} ) 
         
     def refresh_container_info(self):
+        print '3.1'
         cont_names = []
         for cont in self.ws_client.containers.all():
+            print cont
             if cont.name in self.config.get('excluded_containers', ()):
                     continue 
-            x = ContainerInfo(self.ws_client, cont.name)   
+            print '3.2'
+            x = ContainerInfo(self.ws_client, cont.name)
+            print '3.3'   
             data_dict = {
                 "architecture": cont.architecture,
                 "config": cont.config,
@@ -364,10 +383,17 @@ class Server(threading.Thread):
                 "inet" : x.network,
                 "memory" : x.memory
                }
+            print '3.4'
             cont_names.append(data_dict)
+            print '3.5'
+            
+        print '3.6'
         self.containers = cont_names
-        self.refresh_container_stats()
+        print '3.7'
+        #self.refresh_container_stats()
+        print '3.8'
         self.clientupdaterequest.set()
+        print '3.9'
         
 
     
@@ -377,12 +403,19 @@ class Servers(object):
     clientupdaterequest = threading.Event()
      
     def __init__(self, config):
+        print '1.1'
         self.clientupdaterequest.clear()
+        print '1.2'
         self.config = config
+        print '1.3'
         for s in config:
+            print s
             svr = Server(s, config.get(s), self.clientupdaterequest)
+            print '1.4'
             svr.start()
+            print '1.5'
             self.servers.update({ s : svr })
+            print '1.6'
         
     def get(self, server=None):
         if server:
