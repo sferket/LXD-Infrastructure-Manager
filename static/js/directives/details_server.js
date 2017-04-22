@@ -64,7 +64,7 @@ $( document ).ready(function() {
         if (document.getElementById("server-name")){
         	server = document.getElementById("server-name").value;
         	mes = JSON.parse(msg)
-        	$('#test-test').text(mes['localhost']['tmp']);
+        	//$('#test-test').text(mes['localhost']['tmp']);
         	$('#lsb_release').text(mes[server]['lsb_release']);
         	$('#uptime').text(mes[server]['uptime']);
         	$('#cpu').text(mes[server]['cpu']);

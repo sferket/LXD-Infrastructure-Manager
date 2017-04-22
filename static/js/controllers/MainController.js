@@ -41,11 +41,11 @@ function($scope, $http, $compile) {
                 $scope.containers = response.data.containers;
                 $scope.sections = response.data.sections;
                 
-                console.log("response: ", response);
-                console.log("servers: ", $scope.servers);
-                console.log("server_info: ", $scope.server_info);
-                console.log("containers: ", $scope.containers);
-                console.log("sections: ", $scope.sections);
+//                console.log("response: ", response);
+//                console.log("servers: ", $scope.servers);
+//                console.log("server_info: ", $scope.server_info);
+//                console.log("containers: ", $scope.containers);
+//                console.log("sections: ", $scope.sections);
             },
             function Error(response) {
                 console.log("Error getting data");
@@ -57,24 +57,48 @@ function($scope, $http, $compile) {
         return $scope.containers[servername];
     },
     $scope.getServerByName = function(name) {
-    	console.log('=>')
-    	console.log($scope.servers[name])
+//    	console.log('=>')
+//    	console.log($scope.servers[name])
         return $scope.servers[name];
     },
 //    $scope.getServerInfoByName = function(name) {
 //        return $scope.server_info[name];
 //    },
     $scope.getContainerByName = function(server, name) {
+    	console.log('===>', name )
         var containers = $scope.getContainersByServer(server);
-        for (c_index in containers){ 
-            if (containers[c_index].name == name) {
-                return containers[c_index];
+    	var servers = $scope.servers
+//    	console.log('1>', servers[server])
+//    	console.log('2>', servers[server]['lxd_container_get'])
+//    	console.log('3>', servers[server]['lxd_container_get']['test123'])
+//    	console.log('3.1>', servers[server]['lxd_snapshots_all'])
+        for (c_index in servers[server]['lxd_container_get']){
+//        	console.log('4>', c_index)
+//        	console.log('4>', servers[server]['lxd_container_get'][c_index][name])
+        	
+            if (name in servers[server]['lxd_container_get'][c_index]) {
+            	ret = servers[server]['lxd_container_get'][c_index][name]; 
+            	//ret['snapshots'] = servers[server]['lxd_snapshots_all'][c_index][name];
+            	ret['snapshots'] = servers[server]['lxd_snapshots_all'][name]
+                return ret;
             }
         }
+    	
+//    	return servers[server]['lxd_container_get']['test123']
+//        for (c_index in containers){ 
+//            if (containers[c_index].name == name) {
+//                return containers[c_index];
+//            }
+//        }
     },
     // Load detail directives on menu item click 
     $scope.openDetailsContainer = function(server, container) {
     	console.log('$scope.openDetailsContainer')
+    	console.log('1->')
+    	console.log(server)
+    	console.log('2->')
+    	for (var firstKey in container) break;
+    	console.log(firstKey)
         var compiledHtml = $compile(String(
             '<details_container container="getContainerByName(\'-s1-\',\'-c1-\')"' +
             'server="getServerByName(\'-s2-\')" ' +
@@ -83,7 +107,8 @@ function($scope, $http, $compile) {
                 .replace("-s1-", server.servername)
                 .replace("-s2-", server.servername)
                 .replace("-s3-", JSON.stringify(server))
-                .replace("-c1-", container.name)
+                //.replace("-c1-", container.name)
+                .replace("-c1-", firstKey)
                 .replace("-c2-", JSON.stringify(container))
         )($scope);
         $("#details_container").html(compiledHtml);

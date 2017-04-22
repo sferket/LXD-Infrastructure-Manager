@@ -11,7 +11,6 @@
     </div>
 </div>
 <!-- end title row -->
-{{tst}}
 
 <!-- content row -->
 <div class="row">
@@ -22,8 +21,12 @@
         -->
         {% raw %}
         <menu-servers ng-repeat="s in servers" server="s" server-click="openDetailsServer(s)">
-            <menu-containers ng-repeat="c in getContainersByServer(s.servername)" container="c" 
+            <menu-containers ng-repeat="c in s.lxd_container_get" container="c" 
             ng-click="openDetailsContainer(s, c)"></menu-containers>
+				  
+        
+<!--             <menu-containers ng-repeat="c in getContainersByServer(s.servername)" container="c"  -->
+<!--             ng-click="openDetailsContainer(s, c)"></menu-containers> -->
         </menu-servers>
 
         {% endraw %}

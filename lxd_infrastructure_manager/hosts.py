@@ -56,6 +56,7 @@ class Host():
 class Hosts():
     salt_client = None
     hosts = {}
+    containers = {}
     #hosts = { 'eng-lxd1' : Host('eng-lxd1'), 'sandbox-16.lxd' : Host('sandbox-16.lxd')}
     #jid = None
     callback_expected = threading.Event()
@@ -67,16 +68,6 @@ class Hosts():
         self._th = threading.Thread(target=event_callback,  args=(self,))
         self._th.daemon = True
         self._th.start()
-        #self.update_static_info()
-
-        #self.cmd_async(host_discover_target, 'status.meminfo')
-        
-        #self.cmd_async(host_discover_target, 'status.cpuinfo')
-        
-        #self.cmd_async(host_discover_target, ('status.meminfo', 'status.cpuinfo'), ('', '') )
-        #self.cmd_async(host_discover_target, ['status.meminfo'], [[]] )
-        #self.cmd_async(host_discover_target, 'status.meminfo')
-        #self.cmd_async(host_discover_target, 'status.cpuinfo')
 
 
     def get_host(self, name):
@@ -86,10 +77,33 @@ class Hosts():
 
     def update_static_info(self):
         # Get status host information
-        #static_info = ['lsb_distrib_description', 'num_cpus', 'mem_total', 'cpu_model'
-        #               , 'saltversion', 'lsb_distrib_codename']
-        static_info = ['lsb_distrib_description','status.uptime', 'num_cpus', 'cpu_model']
+        static_info = ['lsb_distrib_description', 'num_cpus', 'mem_total', 'cpu_model'
+                       , 'saltversion', 'lsb_distrib_codename', 'kernelrelease', 'ip4_interfaces']
+        #static_info = ['lsb_distrib_description','status.uptime', 'num_cpus', 'cpu_model']
         self.cmd_async(host_discover_target, 'grains.item', static_info)
+
+    def update_container_info(self):
+        print 'oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo'
+        #salt '*' 
+        # Avaialble commands: https://github.com/pcdummy/saltstack-lxd-formula/blob/master/_modules/lxd.py
+        self.cmd_async(host_discover_target, 'lxd.container_get')
+        self.cmd_async(host_discover_target, 'lxd.snapshots_all')
+        # salt '*' lxd.container_state
+        # Snapshots seem to be missing,alternative: salt 'sandbox-16.lxd' cmd.run "lxc info test123"
+    
+    def exec_container_cmd(self,server, container, method, tar_name):
+        print method
+        if method == 'create_snapshot':
+            self.salt_client.cmd_async(server, 'lxd.snapshots_create', [container, tar_name])
+        elif method == "delete_snapshot":
+            self.salt_client.cmd_async(server, 'lxd.snapshots_delete', [container, tar_name])
+        elif method == "activate_snapshot":
+            data = {"type": "copy",
+                    "source": "%s/%s" % (container, tar_name.get('name'))}
+            self.cmd_async(server, 'lxd.container_create', [tar_name.get('name'), data])
+        
+            
+
         
     def cmd_async(self, *args):
         # Convert to list, to enforce the calling function in the return  
@@ -106,6 +120,9 @@ class Hosts():
         #kwargs = {'jid':self.jid}
         kwargs = {}
         #print salt.master.log.critical("dd") #.client.log.error("bla bla")
+        print 'cmd_async'
+        print args2
+        print kwargs
         self.salt_client.cmd_async(*args2, **kwargs)
         #print self.salt_client.run_job('*', 'test.ping')
         
@@ -133,26 +150,10 @@ class Hosts():
       
     def get_display_info(self):
         d = {}
-#         for k,v in self.hosts.iteritems():
-#             print '==(%s)>%s' % (k,v.name)
-            
         for s in self.hosts:
-            #print s
-            #td = self.hosts.get(s).get()
-            #print '1-%s------>%s' % (s,td)
-            #td.update({'servername' : s})
-            #print '2-%s------>%s' % (s,td)
-            
-            #d.update({s: self.hosts.get(s).get()})
-            #d.update({s: {'servername': 'x', 'uptime':'56'}})
-            #d.update({s: {'servername' : s, 'uptime':'56', 'sections' : self.sections, 'test.test' : 'test'}})
-            #print '--->%s' % self.hosts.get(s).fun
             d.update({s: self.hosts.get(s).fun })
-            #d.update({s: {'servername' : '%s - %s' % ( id(self.hosts.get(s)), self.hosts.get(s).fun )} })
-            #d.update({})
-#         for k,v in d.iteritems():
-#             print k 
-#             print v
+
+        print '++++++++++++++++>%s' % d.get('sandbox-16.lxd')
         return d
               
 

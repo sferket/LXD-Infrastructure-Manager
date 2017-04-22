@@ -81,12 +81,18 @@ def serve_static(type, file):
 
 @app.route("/get_info/")
 def get_info_r():
-    containers = {}
     
+    containers = {}
+#     containers['sandbox-16.lxd'] = {'test123' : {'name' : 't123', 'status' : 'Stopped'}
+#                                     , 't456' : {'name' : 't456', 'status' : 'Stopped'} }
+    print 'ppppppppppp:%s' % containers 
 #    for k,v in servers.get_display_info().iteritems():
 #        print 'get_info(%s): %s' % (k,v) 
 
-    print '8888$>%s' % servers.get_display_info()
+    print '8888$>%s' % servers.get_display_info()['sandbox-16.lxd']['lxd_container_get']
+    print '9999$>%s' % servers.get_display_info()['sandbox-16.lxd']['lxd_snapshots_all']
+    
+    
     vals = {
         "servers": servers.get_display_info(),
         #"servers": servers.get(),
@@ -99,6 +105,7 @@ def get_info_r():
 
 @app.route("/container_cmd/", methods=["POST"])
 def container_cmd_handler():
+    print '-9->%s' % request
     if request.method == "POST":
         req_data = request.get_json()
         server = req_data.get("server")
@@ -107,16 +114,14 @@ def container_cmd_handler():
         snap = req_data.get("snap")
         tar_name = '' or req_data.get("tar_name")
         if req_data.get("type") == "container":
-            lxd_api.exec_container_cmd(server, container, method, tar_name)
-            # get update container info after method
-            c_info = get_container_info(server, container)
-            return make_response(jsonify(c_info))
+            servers.exec_container_cmd(server, container, method, tar_name)
         elif req_data.get("type") == "snapshot":
-            lxd_api.exec_snapshot_cmd(server, snap, container, method)
-            c_info = get_container_info(server, container)
-            return make_response(jsonify(c_info))
+            servers.exec_container_cmd(server, container, method, snap)
 
+        #return xxx??
+        
 def get_container_info(server, container):
+    print 'PPPPPPPPPPrint get_container_info'
     field_translations = {
         "name": "name",
 

@@ -1,10 +1,41 @@
+<!-- <div class="col-xs-12"> -->
+<!--     <h5 class="link_cursor"> -->
+<!-- 	    <div ng-repeat="(key, value) in container"> -->
+<!-- 	    	<div ng-switch="value.status"> -->
+<!-- 	  			<div ng-switch-when="Running"><span class="glyphicon glyphicon-play"> [[key]]</span></div> -->
+<!-- 	  			<div ng-switch-when="Stopped"><span class="glyphicon glyphicon-stop"> [[key]]</span></div> -->
+<!-- 	  			<div ng-switch-when="Frozen"><span class="glyphicon glyphicon-pause"> [[key]]</span></div> -->
+<!-- 	  			<div ng-switch-default><span class="glyphicon glyphicon-question-sign"> [[key]]</span></div> -->
+<!-- 			</div> -->
+<!-- 	    </div> -->
+<!--     </h5> -->
+<!-- </div> -->
+
 <div class="col-xs-12">
     <h5 class="link_cursor">
-    	<div ng-switch="container.status">
-  			<div ng-switch-when="Running"><span class="glyphicon glyphicon-play"> [[container.name]]</span></div>
-  			<div ng-switch-when="Stopped"><span class="glyphicon glyphicon-stop"> [[container.name]]</span></div>
-  			<div ng-switch-when="Frozen"><span class="glyphicon glyphicon-pause"> [[container.name]]</span></div>
-  			<div ng-switch-default><span class="glyphicon glyphicon-question-sign"> [[container.name]]</span></div>
-		</div>
+	    <div ng-repeat="(key, value) in container">
+	    <h3 ng-click="containerClick([[key]]);toggle=!toggle;" class="link_cursor">
+	    <span class="glyphicon glyphicon-triangle-right" aria-hidden="true" ng-class="{'hide': !toggle}" style="font-size:10px;"></span>
+    	<span class="glyphicon glyphicon-triangle-bottom" aria-hidden="true" ng-class="{'hide': toggle}" style="font-size:10px;"></span>
+	    
+	    test
+	    
+		    <div class="col-xs-12">
+	    		<h5 class="link_cursor">
+			    	<div ng-switch="value.status">
+			  			<div ng-switch-when="Running"><span class="glyphicon glyphicon-play"> [[key]]</span></div>
+			  			<div ng-switch-when="Stopped"><span class="glyphicon glyphicon-stop"> [[key]]</span></div>
+			  			<div ng-switch-when="Frozen"><span class="glyphicon glyphicon-pause"> [[key]]</span></div>
+			  			<div ng-switch-default><span class="glyphicon glyphicon-question-sign"> [[key]]</span></div>
+					</div>
+				</h5>
+			</div>
+		</h3>
+	    </div>
+		<div class="col-xs-10 col-xs-offset-1 bg_gray" ng-transclude ng-class="{'hide': toggle}"></div>
+	    
     </h5>
 </div>
+
+
+

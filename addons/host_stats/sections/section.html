@@ -5,7 +5,6 @@
         <h5><strong>CPU Usage(%)</strong></h5> 
         <h5><strong>Load (1 - 5 - 15 min)</strong></h5>
         <h5><strong>CPU Cores</strong></h5>
-        <h5><strong>CPU Model</strong></h5>
     </div>
     <div class="col-xs-3">
         <h5>: [[server.grains_item.lsb_distrib_description]]</h5>
@@ -13,7 +12,7 @@
         <h5>: [[server.ps_cpu_percent]]</h5>
         <h5>: [[server.status_loadavg['1-min'] ]] - [[server.status_loadavg['5-min'] ]] - [[server.status_loadavg['15-min'] ]]</h5>
         <h5>: [[server.grains_item.num_cpus]]</h5>
-        <h5>: [[server.grains_item.cpu_model]]</h5>
+        
     </div>
     <div class="col-xs-2 col-xs-offset-1">
         <h5><strong>MemTotal</strong></h5> 
@@ -28,5 +27,6 @@
         <h5>: [[server.status_meminfo.MemFree.value]]</h5>
         <h5>: [[server.status_meminfo.SwapTotal.value]]</h5>
         <h5>: [[server.status_meminfo.SwapFree.value]]</h5>
-    </div>    
+    </div>   
+<h5>: [[server]]</h5>     
 </div>
