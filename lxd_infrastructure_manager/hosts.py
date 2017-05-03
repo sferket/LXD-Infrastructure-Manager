@@ -26,7 +26,9 @@ def event_callback(hosts):
             for key, val in ret.get('return').iteritems():
                 print '99999999999999999999999999999999999999999999999999999999999999999'
                 print '%s ---> %s -> %s' % (ret.get('id'), key.replace('.', '_'), val)
-                hosts.get_host(ret.get('id')).add_info(key.replace('.', '_'), val)
+                #hosts.get_host(ret.get('id')).add_info(key.replace('.', '_'), val)
+                if not (type(val) == str):  # Ignore Python error messages
+                    hosts.get_host(ret.get('id')).add_info(key, val)
 
     
     
@@ -39,8 +41,8 @@ class Host():
         self.fun = {'servername' : name}
     
     def add_info(self, func, output):
-        if func == 'grains_item':
-            print '--UPDATE(%s)-->%s' % (self.name, func) 
+#         if func == 'grains_item':
+#             print '--UPDATE(%s)-->%s' % (self.name, func) 
         #print '--UPDATE2(%s)-->%s' % (self.name, self.fun)
         self.fun.update({func : output})
         #print '--UPDATE3(%s)-->%s' % (self.name, self.fun)
@@ -88,6 +90,8 @@ class Hosts():
         # Avaialble commands: https://github.com/pcdummy/saltstack-lxd-formula/blob/master/_modules/lxd.py
         self.cmd_async(host_discover_target, 'lxd.container_get')
         self.cmd_async(host_discover_target, 'lxd.snapshots_all')
+        #lxd.container_config_get('sandbox-16', 'user.parent')
+        #self.cmd_async(host_discover_target, 'lxd.container_config_get', ['test123', 'user.parent'])
         # salt '*' lxd.container_state
         # Snapshots seem to be missing,alternative: salt 'sandbox-16.lxd' cmd.run "lxc info test123"
     
@@ -154,8 +158,94 @@ class Hosts():
             d.update({s: self.hosts.get(s).fun })
 
         print '++++++++++++++++>%s' % d.get('sandbox-16.lxd')
+        
+        #self.get_tree_list()
         return d
               
+    def get_tree_list(self, checksum):
+        nodes = {}
+        for hostname,hostitems in self.hosts.iteritems():
+            nodeID = 'host.%s' % hostname
+            nodes.update ({ nodeID : {'parent' : None
+                       , 'name' : hostname
+                       , 'host' : hostname 
+                       , 'nodeId': nodeID
+                       , 'type' : 'host'
+                       , 'image' : "/static/img/container-host.png"
+                       , 'expanded' : False}
+                       })
+            if hostitems.get_info().has_key('lxd.container_get'):
+                for containers in hostitems.get_info().get('lxd.container_get'):
+                    for k,v in containers.iteritems():
+                        nodeID = 'container.%s' % k
+                        parent = 'host.%s' % hostname
+                        if v.get('config').get('user.parent'):
+                            #if  hostitems.get_info().get('lxd.container_get').has_key(v.get('config').get('user.parent')):
+                            parent = 'container.%s' % v.get('config').get('user.parent')
+                        nodes.update ({ nodeID : {'parent' : parent
+                                   , 'name' : k
+                                   , 'host' : hostname
+                                   , 'container' : k
+                                   , 'nodeId': nodeID 
+                                   , 'type' : 'container'
+                                   , 'image' : "/static/img/container-green.png"
+                                   , 'expanded' : False }
+                                 
+                                   })
+
+        # check for missing parents....
+        missing_nodes = {}
+        for k,v in nodes.iteritems():
+            p = v.get('parent')
+            if p not in nodes.keys():
+                if v.get('type') == 'container':
+                    nodeID = p #'map.%s' % p.replace('container.', '')
+                    parent = 'host.%s' % v.get('host')
+                    missing_nodes.update ({ nodeID : {'parent' : parent
+                               , 'name' : p.replace('container.', '')
+                               , 'nodeId': nodeID 
+                               , 'type' : 'map'
+                               , 'expanded' : False }  
+                                })                  
+        print 'MISSING:%s' % missing_nodes
+        for k,v in missing_nodes.iteritems():
+            nodes.update({k : v})
+            
+        parents = {}
+        for k,v in nodes.iteritems():
+            p = v.get('parent')
+            if p not in nodes.keys():
+                p = None
+            if not parents.has_key(p):
+                parents.update({p : []})
+            parents[p] += [k]
+        
+        def pop_list(node, children, level=0):
+            childs = []
+            print '=>%s' % children
+            if len(children) > 0:
+                for c in sorted(children):
+                    print c
+                    n = pop_list(c, parents.get(c, []), level=level+1)
+                    childs += [n]
+                    
+            if node:
+                p = nodes[node]
+                p.update({'children' : childs})
+                return p
+            else: 
+                return childs
+ 
+        res = pop_list(None, parents.get(None))
+        cs = str(hash(repr(res)))
+        hash(repr(res))
+        print 'Old:%s  New:%s' % (checksum, cs)
+        return cs, (res if cs != checksum else False)
+        #return cs, '123'  
+              
+
+
+
 
     def do_updates(self):
         for func in dir(self):

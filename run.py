@@ -81,26 +81,46 @@ def serve_static(type, file):
 
 @app.route("/get_info/")
 def get_info_r():
+    print 'CALLLLLL'
+#     print '-request->%s' % request
+#     print '-request->%s' % request.method
+#     print request.args.get('host', '')
+#     print request.args.get('container', '')
     
     containers = {}
 #     containers['sandbox-16.lxd'] = {'test123' : {'name' : 't123', 'status' : 'Stopped'}
 #                                     , 't456' : {'name' : 't456', 'status' : 'Stopped'} }
-    print 'ppppppppppp:%s' % containers 
+    #print 'ppppppppppp:%s' % containers 
 #    for k,v in servers.get_display_info().iteritems():
 #        print 'get_info(%s): %s' % (k,v) 
 
-    print '8888$>%s' % servers.get_display_info()['sandbox-16.lxd']['lxd_container_get']
-    print '9999$>%s' % servers.get_display_info()['sandbox-16.lxd']['lxd_snapshots_all']
+    #print '8888$>%s' % servers.get_display_info()['sandbox-16.lxd']['lxd_container_get']
+    #print '9999$>%s' % servers.get_display_info()['sandbox-16.lxd']['lxd_snapshots_all']
     
+    print request.args.get('checksumNodes', '')
+    tree_checksum, tree_list = servers.get_tree_list(request.args.get('checksumNodes', ''))
     
     vals = {
         "servers": servers.get_display_info(),
-        #"servers": servers.get(),
         "containers": containers,
-#        "sections": servers.sections,
-#        "server_info": server_info,
+        "test": time.strftime("%H:%M:%S")
     }
+    if tree_list:
+        vals.update({"tree": tree_list})
+        vals.update({"tree_checksum": tree_checksum})
+        #vals.update({"tree_checksum": '123456'})
+        print 'YYYYYYYYY:%s' % (tree_checksum)
     
+    if request.args.get('host', ''):
+        vals.update({"server_data" : servers.get_display_info()[request.args.get('host', '')]})
+
+    if request.args.get('container', ''):
+        for c in servers.get_display_info()[request.args.get('host', '')]['lxd.container_get']:
+            if c.has_key(request.args.get('container', '')):
+                vals.update({"container_data" : c.get(request.args.get('container', ''))})
+    
+    
+    print 'ENDCALLLLL'
     return jsonify(vals)
 
 @app.route("/container_cmd/", methods=["POST"])

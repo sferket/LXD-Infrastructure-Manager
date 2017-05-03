@@ -11,7 +11,6 @@
     </div>
 </div>
 <!-- end title row -->
-
 <!-- content row -->
 <div class="row">
     <div class="col-md-3">
@@ -20,14 +19,14 @@
         <h2><strong>containers</strong></h2>
         -->
         {% raw %}
-        <menu-servers ng-repeat="s in servers" server="s" server-click="openDetailsServer(s)">
-            <menu-containers ng-repeat="c in s.lxd_container_get" container="c" 
-            ng-click="openDetailsContainer(s, c)"></menu-containers>
-				  
         
-<!--             <menu-containers ng-repeat="c in getContainersByServer(s.servername)" container="c"  -->
+        <tree nodes='treeNodes'></tree>
+        
+<!--         <menu-servers ng-repeat="s in servers" server="s" server-click="openDetailsServer(s)"> -->
+<!--             <menu-containers ng-repeat="c in s.lxd_container_get" container="c"  -->
 <!--             ng-click="openDetailsContainer(s, c)"></menu-containers> -->
-        </menu-servers>
+
+<!--         </menu-servers> -->
 
         {% endraw %}
     </div>

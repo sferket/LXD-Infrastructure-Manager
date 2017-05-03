@@ -1,6 +1,7 @@
 <div class="row">
     <div class="col-xs-12 center bg_green">
         <h1 class="m0">[[server.servername]]</h1>
+        <h1 class="m0">[[ss]]</h1>
         <input type="hidden" name="server-name" id="server-name" value="[[server.servername]]">
     </div>
 </div>
