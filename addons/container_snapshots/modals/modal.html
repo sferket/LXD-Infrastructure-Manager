@@ -1,0 +1,75 @@
+<div class="modal fade" id="createsnap-modal"tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg_green center">
+                <h3 class="modal-title"><strong>Create snapshot</strong></h3>
+            </div>
+            <div class="modal-body">
+                <div class="input-group">
+                    <span class="input-group-addon" id="snap-input-desc">Snapshot name:</span>
+                    <input type="text" class="form-control" placeholder="Name" aria-describedby="snap-input-desc" id="tar_name"/>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="col-xs-3 col-xs-offset-6" data-dismiss="modal"
+                ng-click="runContainerMethod(server.servername, container.name, 'create_snapshot', 'container', '')">
+                    <h5>Create</h5>
+                </button>
+                <button class="col-xs-3" data-dismiss="modal">
+                    <h5>Cancel</h5>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>  
+
+<script type="text/javascript">
+$('#activesnap-modal').on('show.bs.modal', function (e) {
+	s_name = $(e.relatedTarget).data('snapshot') ;
+	c_name = $(e.relatedTarget).data('container') ;
+	profiles = $(e.relatedTarget).data('profiles') ; 
+	for (p in profiles) {
+		$('#cont_profile').append("<option data-tokens=\"" + profiles[p].name + "\">" + profiles[p].name + " - " + profiles[p].description + "</option>");
+	}
+	console.log('->') ;
+	console.log($(e.relatedTarget).data('snapshot')) ;
+	console.log($(e.relatedTarget).data('container')) ;
+	//console.log($(e.relatedTarget).scope().selectedNode) ;
+	$('#cont_name').val(c_name+"-"+s_name) ;
+	$('#parent_name').val(c_name) ;
+	
+}) ;
+</script>
+
+<div class="modal fade" id="activesnap-modal"tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg_green center">
+                <h3 class="modal-title"><strong>Activate snapshot</strong></h3>
+            </div>
+            <div class="modal-body">
+                <div class="input-group">
+                    <span class="input-group-addon" id="snap-input">Name:</span>
+                    <input type="text" class="form-control" placeholder="Name" aria-describedby="snap-input-desc" id="cont_name"/>
+                </div>
+                <div class="input-group">
+                    <span class="input-group-addon" id="snap-profile">Profile:</span>
+					<select class="form-control" placeholder="Profile" aria-describedby="snap-input-desc" id="cont_profile"/>
+                </div>
+                <div class="input-group">
+                    <span class="input-group-addon" id="snap-parent">Parent:</span>
+                    <input type="text" class="form-control" placeholder="Parent" aria-describedby="snap-parent" id="parent_name"/>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="col-xs-3 col-xs-offset-6" data-dismiss="modal"
+                ng-click="runContainerMethod(server.servername, container.name, 'create_snapshot', 'container', '')">
+                    <h5>Create</h5>
+                </button>
+                <button class="col-xs-3" data-dismiss="modal">
+                    <h5>Cancel</h5>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

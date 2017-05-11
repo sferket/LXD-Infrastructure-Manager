@@ -3,6 +3,7 @@ import time
  
 class HostStats(Host):
     def update(self):
+        print 'HOST STATTS.....................update'
         self.cmd_async('*', 'status.uptime')
         self.cmd_async('*', 'status.loadavg')
         self.cmd_async('*', 'status.meminfo')

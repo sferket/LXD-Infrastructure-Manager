@@ -1,17 +1,30 @@
+
+<script type="text/javascript">
+function humanFileSize(size) {
+    var i = Math.floor( Math.log(size) / Math.log(1024) );
+    return ( size / Math.pow(1024, i) ).toFixed(2) * 1 + ' ' + ['B', 'kB', 'MB', 'GB', 'TB'][i];
+}; 
+</script>
+<script type="text/javascript">
+function testFunc(count) {
+	count = count + 1 ;
+}; 
+</script>
+
 <div class="row mt25">
     <div class="col-xs-2 col-xs-offset-1">
         <h5><strong>OS</strong></h5> 
         <h5><strong>Uptime</strong></h5> 
         <h5><strong>CPU Usage(%)</strong></h5> 
-        <h5><strong>Load (1 - 5 - 15 min)</strong></h5>
+        <h5><strong>Load (1-5-15min)</strong></h5>
         <h5><strong>CPU Cores</strong></h5>
     </div>
     <div class="col-xs-3">
-        <h5>: [[server.grains_item.lsb_distrib_description]]</h5>
-        <h5>: [[server.status_uptime.time]]</h5>
-        <h5>: [[server.ps_cpu_percent]]</h5>
-        <h5>: [[server.status_loadavg['1-min'] ]] - [[server.status_loadavg['5-min'] ]] - [[server.status_loadavg['15-min'] ]]</h5>
-        <h5>: [[server.grains_item.num_cpus]]</h5>
+        <h5>: [[server['grains.item'].lsb_distrib_description]]</h5>
+        <h5>: [[server['status.uptime']['time'] ]]</h5>
+        <h5>: [[server['ps.cpu_percent'] ]]</h5>
+        <h5>: [[server['status.loadavg']['1-min'] ]] - [[server['status.loadavg']['5-min'] ]] - [[server['status.loadavg']['15-min'] ]]</h5>
+        <h5>: [[server['grains.item']['num_cpus'] ]]</h5>
         
     </div>
     <div class="col-xs-2 col-xs-offset-1">
@@ -22,11 +35,13 @@
         <h5><strong>SwapFree</strong></h5> 
     </div>
     <div class="col-xs-3">
-        <h5>: [[server.status_meminfo.MemTotal.value]]</h5>
-        <h5>: [[server.status_meminfo.MemAvailable.value]]</h5>
-        <h5>: [[server.status_meminfo.MemFree.value]]</h5>
-        <h5>: [[server.status_meminfo.SwapTotal.value]]</h5>
-        <h5>: [[server.status_meminfo.SwapFree.value]]</h5>
+        <h5>: [[humanFileSize(server['status.meminfo']['MemTotal']['value']) ]]</h5>
+        <h5>: [[humanFileSize(server['status.meminfo']['MemAvailable']['value']) ]]</h5>
+        <h5>: [[humanFileSize(server['status.meminfo']['MemFree']['value']) ]]</h5>
+        <h5>: [[humanFileSize(server['status.meminfo']['SwapTotal']['value']) ]]</h5>
+        <h5>: [[humanFileSize(server['status.meminfo']['SwapFree']['value']) ]]</h5>
     </div>   
-<h5>: [[server]]</h5>     
+    
+   
+<!-- <h5>: [[server]]</h5>      -->
 </div>

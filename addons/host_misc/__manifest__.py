@@ -7,4 +7,5 @@
     "author" : "Open2Bizz",
     "website" : "http://www.open2bizz.nl",
     "license" : "LGPL-3",
+    "priority" : 100,
 }

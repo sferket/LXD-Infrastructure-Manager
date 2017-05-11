@@ -1,4 +1,5 @@
 app.directive("detailsContainer", ["$http", "$compile", function($http, $compile) {
+	console.log("ccccccccccccccccccccccccc");
     return {
         restrict: "E",
         scope: {
@@ -6,7 +7,8 @@ app.directive("detailsContainer", ["$http", "$compile", function($http, $compile
             server: "=server",
             up: "&callbackFn",
         },
-        templateUrl: "/static/js/directives/details_container.html",
+        //templateUrl: "/static/js/directives/details_container.html",
+        templateUrl: "/renderedstatic/container/details_container.html",
         link: function($scope, element, attrs) {
             $scope.runContainerMethod = function(server, container, method, type, snap) {
                 console.log("runcontainermethod");

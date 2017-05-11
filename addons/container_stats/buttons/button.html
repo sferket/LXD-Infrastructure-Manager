@@ -1,0 +1,30 @@
+<button class="col-xs-3" ng-click="runContainerMethod(server.servername, container.name, 'start', 'container', '')" ng-show=container.status=='Stopped' >
+    <h5>
+        <span class="glyphicon glyphicon-play" aria-hidden="true"></span>
+        <strong>start</strong>
+    </h5>
+</button>
+<button class="col-xs-3" ng-click="runContainerMethod(server.servername, container.name, 'stop', 'container', '')" ng-show=container.status=='Running'>
+    <h5>
+        <span class="glyphicon glyphicon-stop" aria-hidden="true"></span>
+        <strong>stop</strong>
+    </h5>
+</button>
+<button class="col-xs-3" ng-click="runContainerMethod(server.servername, container.name, 'freeze', 'container', '')" ng-show=container.status=='Running'>
+    <h5>
+        <span class="glyphicon glyphicon-asterisk" aria-hidden="true"></span>
+        <strong>freeze</strong>
+    </h5>
+</button>
+<button class="col-xs-3" ng-click="runContainerMethod(server.servername, container.name, 'unfreeze', 'container', '')"  ng-show=container.status=='Frozen'>
+    <h5>
+        <span class="glyphicon glyphicon-tint" aria-hidden="true"></span>
+        <strong>unfreeze</strong>
+    </h5>
+</button>
+<button class="col-xs-3" ng-click="runContainerMethod(server.servername, container.name, 'delete', 'container', '')" ng-show=container.status=='Stopped'>
+    <h5>
+        <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
+        <strong>Delete container</strong>
+    </h5>
+</button>

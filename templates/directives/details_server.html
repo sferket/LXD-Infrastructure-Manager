@@ -1,8 +1,8 @@
+{{modals}}
 <div class="row">
     <div class="col-xs-12 center bg_green">
         <h1 class="m0">[[server.servername]]</h1>
-<!--         <h1 class="m0">[[server]]</h1> -->
-        <input type="hidden" name="server-name" id="server-name" value="[[server.servername]]">
+<!--         <input type="hidden" name="server-name" id="server-name" value="[[server.servername]]"> -->
     </div>
 </div>
 
@@ -14,54 +14,7 @@
 
 
 
-<div class="row mt25">
-	<div class="row">
-	    <div class="col-xs-10 col-xs-offset-1 mt25 bg_green center">
-	        <h3 class="m0">ZFS Pools ([[server.zpoolupdate]])</h3>
-	        <h5>Last update:[[server.zpoolupdate]]</h5>
-	    </div>
-	</div>
 
-    <div class="col-xs-10 col-xs-offset-1 mt25 bg_green center">
-        <div class="col-xs-2">
-            <h4 class="m0"><strong>Name</strong></h4>
-        </div>
-        <div class="col-xs-2">
-            <h4 class="m0"><strong>Size</strong></h4>
-        </div>
-        <div class="col-xs-2">
-            <h4 class="m0"><strong>Use</strong></h4>
-        </div>
-        <div class="col-xs-2">
-            <h4 class="m0"><strong>Fragmented</strong></h4>
-        </div>
-        <div class="col-xs-2">
-            <h4 class="m0"><strong>Health</strong></h4>
-        </div>
-        
-    </div>
-<!-- 	<div id="data-table"></div> -->
-	<div class="col-xs-10 col-xs-offset-1 center" ng-repeat="d in server.zpool" style="border-bottom:1px solid black;"> 
-        <div class="col-xs-2">
-            <h5>[[d.NAME]]</h5>
-        </div>
-        <div class="col-xs-2">
-            <h5>[[d.SIZE]]</h5>
-        </div>
-        <div class="col-xs-2">
-            <h5>[[d.ALLOC]]</h5>
-        </div>
-        <div class="col-xs-2">
-            <h5>[[d.FRAG]]</h5>
-        </div>
-        <div class="col-xs-2">
-            <h5>[[d.HEALTH]]</h5>
-        </div>
-	
-	</div>
-
-
-</div>
 
 
 

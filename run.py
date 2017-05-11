@@ -18,28 +18,16 @@ import pdb
 import json
 
 import time
-print '444' 
-
+import threading
 from lxd_infrastructure_manager.hosts import Hosts
 from lxd_infrastructure_manager.addons import Load
 
-#hosts = Hosts()
-
-#time.sleep(20)
-
-print '-1.1'
 app = Flask(__name__)
-print '-1.2'
 app.debug = True #TODO REMOVE FOR LIVE
-print '-1.3'
 app.config["SECRET_KEY"] = "UBeCeTW3TE5c24XecqLWGoRCBhdDKR" #TODO ACTUAL SECRET KEY
-print '-1.3'
 socketio = lxd_socketio()
-print '-1.4'
 lxd_api = LxdApi()
-print '-1.5'
 global config
-print '-1.6'
 thread = None
 servers = None
 
@@ -47,35 +35,32 @@ servers = None
 def main():
     return render_template("index.html")
 
-@app.route('/flaskstatic/<path:path>')
-def serve_partial(path):
-    print '+++++++++++++++++Staitc'
-    tst = '<div class="row bg_green">\
-    <div class="col-md-12 center">\
-        <h1 style="color:white;">LXD Control Panel [[controller]]</h1>\
-    </div>\
-    </div>'
-    from flask import Markup
-
-    #return render_template('/partial/{}'.format(path))
-    tst = '<h1 style="color:white;">LXD Control Panel</h1>'
-    #tst = 'test123'
-    return render_template('directives/menu_servers_tmp.html', tst=Markup(tst))
-
 @app.route('/renderedstatic/<type>/<file>')
 def serve_static(type, file):
+    print 'SERVE STATIC: %s - %s' % (type, file)
 #     tst = '<div class="row bg_green">\
 #     <div class="col-md-12 center">\
 #         <h1 style="color:white;">LXD Control Panel [[controller]]</h1>\
 #     </div>\
 #     </div>'
-    
-
+     
+ 
     #return render_template('/partial/{}'.format(path))
     #tst = '<h1 style="color:white;">LXD Control Panel</h1>'
     #tst = 'test123'
     #return render_template('directives/%s' % file, tst=Markup(tst))
-    return render_template('directives/%s' % file, sections=Markup(load.host_sections), buttons=Markup(load.host_buttons) )
+    if type == 'host':
+        return render_template('directives/%s' % file
+                               , sections=Markup(load.get_host_sections())
+                               , buttons=Markup(load.host_buttons)
+                               , modals=Markup(load.host_modals)
+                               )
+    elif type == 'container':
+        return render_template('directives/%s' % file
+                               , sections=Markup(load.get_cont_sections())
+                               , buttons=Markup(load.cont_buttons)
+                               , modals=Markup(load.cont_modals)
+                                )
 
 
 
@@ -128,15 +113,18 @@ def container_cmd_handler():
     print '-9->%s' % request
     if request.method == "POST":
         req_data = request.get_json()
+        print '-->%s' % req_data
         server = req_data.get("server")
         container = req_data.get("container")
         method = req_data.get("method")
         snap = req_data.get("snap")
         tar_name = '' or req_data.get("tar_name")
         if req_data.get("type") == "container":
+            print 'SANPSHOTTTTT'
             servers.exec_container_cmd(server, container, method, tar_name)
         elif req_data.get("type") == "snapshot":
             servers.exec_container_cmd(server, container, method, snap)
+            
 
         #return xxx??
         
@@ -155,15 +143,20 @@ def update_thread():
     """Example of how to send server generated events to clients."""
     count = 0
     while True:
+        print 'UPDATE WAIT'
+        #updateEvent.clear()
+        #updateEvent.wait(10) 
         socketio.sleep(5)
+        print 'UPDATE'
         count += 1
         mes = {}
+        servers.do_updates()
         if servers:
-            for s in servers.get():
-                mes.update({s : servers.get(s).get_info()})
-            mes = json.dumps(mes)
-            
-            socketio.emit('my_response',
+#             for s in servers.get():
+#                 mes.update({s : servers.get(s).get_info()})
+#             mes = json.dumps(mes)
+                
+            socketio.emit('update',
                            mes,
                           namespace='/update')
         
@@ -172,7 +165,7 @@ def got_event(msg):
     global thread
     if thread is None:
         thread = socketio.start_background_task(target=update_thread)
-    socketio.emit('my_response', {'data': 'Connected', 'count': 0})
+    socketio.emit('update', {'data': 'Connected', 'count': 0})
 
 @app.after_request
 def add_header(response):
@@ -218,6 +211,10 @@ def config_app():
     #socketio.set_lxd_config(config)
     #lxd_api.set_config(config)
 # New
+    global updateEvent
+    updateEvent = threading.Event()
+    updateEvent.clear()
+
     global servers
     #servers = Servers(config)
     print '4'
@@ -225,6 +222,7 @@ def config_app():
     load = Load('/home/ferkets/git/LXD-Infrastructure-Manager/addons')
     load.inject_hosts_update_methods(Hosts)
     servers = Hosts()
+    servers.initUpdateEvent(updateEvent)
     #servers.update_host_stats()
     
     servers.do_updates()

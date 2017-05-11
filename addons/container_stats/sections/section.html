@@ -1,0 +1,30 @@
+<div class="row mt25">
+    <div class="col-xs-2 col-xs-offset-1">
+        <h5><strong>Status</strong></h5> 
+        <h5><strong>Server</strong></h5> 
+        <h5><strong>Mac</strong></h5> 
+        <h5><strong>Inet</strong></h5>
+        <h5><strong>Memory usage</strong></h5>
+        <h5><strong>Swap usage</strong></h5>
+    </div>
+    <div class="col-xs-3">
+        <h5>: [[container.status]]</h5>
+        <h5>: [[server.servername]]</h5>
+        <h5>: [[container.config['volatile.eth0.hwaddr'] ]]</h5>
+        <h5>: [[container.inet]]</h5>
+        <h5>: [[container.memory.usage]]</h5>
+        <h5>: [[container.memory.swap_usage]]</h5>
+    </div>
+    <div class="col-xs-2 col-xs-offset-1">
+        <h5><strong>Architecture</strong></h5> 
+        <h5><strong>Profiles</strong></h5>
+        <h5><strong>Create date</strong></h5>
+        <h5><strong>CPU Usage</strong></h5> 
+    </div>
+    <div class="col-xs-3">
+        <h5>: [[container.architecture]]</h5>
+        <h5>: [[container.profiles]]</h5>
+        <h5>: [[container.created_at]]</h5>
+        <h5>: [[container.cpu]]</h5>
+    </div>
+</div>
