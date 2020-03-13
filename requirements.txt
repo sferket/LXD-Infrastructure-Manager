@@ -20,7 +20,7 @@ pycparser==2.14
 pylxd==2.0.3
 python-dateutil==2.5.3
 python-engineio==1.0.3
-python-gnupg==0.3.9
+python-gnupg==0.4.4
 python-socketio==1.5.1
 PyYAML==3.12
 requests==2.11.1
